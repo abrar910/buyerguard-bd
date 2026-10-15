@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Records Dashboard — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb and Page Header -->
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small text-muted">
+          <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
+        Synthetic Land Records Dashboard
+      </h2>
+      <p class="text-muted small mb-0">
+        Calculated live from SQLite database and deterministic Risk Engine.
+      </p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('standalone_checklist') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-card-checklist me-1"></i> Pre-Purchase Checklist
+      </a>
+      <a href="{{ url_for('index') }}" class="btn btn-teal btn-sm">
+        <i class="bi bi-search me-1"></i> New Search
+      </a>
+    </div>
+  </div>
+
+  <!-- Real Statistics Derived from Database & Risk Engine -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+          <i class="bi bi-layers"></i>
+        </div>
+        <div>
+          <div class="stat-value">{{ stats.total_plots }}</div>
+          <div class="stat-label">Total Demo Plots</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <i class="bi bi-exclamation-octagon"></i>
+        </div>
+        <div>
+          <div class="stat-value">{{ stats.plots_review_needed }}</div>
+          <div class="stat-label">Flags / Review Needed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon danger">
+          <i class="bi bi-shield-x"></i>
+        </div>
+        <div>
+          <div class="stat-value">{{ stats.duplicate_sale_conflicts }}</div>
+          <div class="stat-label">Duplicate Sale Conflicts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon teal">
+          <i class="bi bi-file-earmark-diff"></i>
+        </div>
+        <div>
+          <div class="stat-value">{{ stats.incomplete_records }}</div>
+          <div class="stat-label">Incomplete Records</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Records Table Card with Filters -->
+  <div class="card card-custom mb-4">
+    <div class="card-header card-header-clean bg-white">
+      <div class="row g-3 align-items-center justify-content-between">
+        <div class="col-12 col-md-4">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-filter"></i></span>
+            <input type="text" id="table-quick-search" class="form-control border-start-0" placeholder="Filter visible records...">
+          </div>
+        </div>
+
+        <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end gap-2">
+          <!-- Status Filter -->
+          <form method="GET" action="{{ url_for('dashboard') }}" class="d-flex flex-wrap align-items-center gap-2">
+            <select name="status" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+              <option value="">All Review Statuses</option>
+              <option value="No Demo Flags Detected" {% if selected_status == 'No Demo Flags Detected' %}selected{% endif %}>No Flags Detected</option>
+              <option value="Review Needed" {% if selected_status == 'Review Needed' %}selected{% endif %}>Review Needed</option>
+              <option value="Potential Inconsistency" {% if selected_status == 'Potential Inconsistency' %}selected{% endif %}>Potential Inconsistency</option>
+              <option value="Information Incomplete" {% if selected_status == 'Information Incomplete' %}selected{% endif %}>Information Incomplete</option>
+            </select>
+
+            <select name="mutation" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+              <option value="">All Mutation Statuses</option>
+              <option value="mutated" {% if selected_mutation == 'mutated' %}selected{% endif %}>Mutated (Namjari)</option>
+              <option value="pending" {% if selected_mutation == 'pending' %}selected{% endif %}>Pending Application</option>
+              <option value="missing" {% if selected_mutation == 'missing' %}selected{% endif %}>Missing Record</option>
+            </select>
+
+            {% if selected_status or selected_mutation %}
+              <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm" title="Clear Filters">
+                <i class="bi bi-x-circle"></i> Clear
+              </a>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-custom table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Plot Identifier</th>
+            <th>Location Details</th>
+            <th>Khatian Ref</th>
+            <th>Deed Ref</th>
+            <th>Mutation Status</th>
+            <th style="min-width: 130px;">Completeness</th>
+            <th>Evaluation Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="plots-table-body">
+          {% for item in plots %}
+          <tr>
+            <td>
+              <a href="{{ url_for('plot_detail', plot_id=item.plot.plot_id) }}" class="fw-bold text-decoration-none" style="color: var(--brand-navy-800);">
+                {{ item.plot.plot_id }}
+              </a>
+              {% if item.assessment.has_duplicate_conflict %}
+                <span class="badge bg-danger ms-1" title="Duplicate Sale Anomaly Detected">
+                  <i class="bi bi-shield-x"></i> Conflict
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="small fw-semibold">{{ item.plot.demo_mouza_code }}</div>
+              <div class="text-muted small">{{ item.plot.demo_upazila }}, {{ item.plot.demo_district }}</div>
+            </td>
+            <td>
+              {% if item.plot.khatian_ref %}
+                <span class="badge bg-light text-dark border">{{ item.plot.khatian_ref }}</span>
+              {% else %}
+                <span class="badge bg-warning-subtle text-warning border border-warning">Missing</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.plot.deed_ref %}
+                <code class="small text-secondary">{{ item.plot.deed_ref }}</code>
+              {% else %}
+                <span class="badge bg-warning-subtle text-warning border border-warning">Not Provided</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if 'mutated' in (item.plot.mutation_status or '')|lower %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                  <i class="bi bi-check-circle"></i> Mutated
+                </span>
+              {% elif 'pending' in (item.plot.mutation_status or '')|lower %}
+                <span class="badge bg-info-subtle text-info border border-info-subtle">
+                  <i class="bi bi-hourglass-split"></i> Pending
+                </span>
+              {% else %}
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                  <i class="bi bi-exclamation-circle"></i> Missing
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height: 6px;">
+                  <div class="progress-bar {% if item.assessment.completeness.percentage == 100 %}bg-success{% elif item.assessment.completeness.percentage >= 70 %}bg-info{% else %}bg-warning{% endif %}" 
+                       role="progressbar" 
+                       style="width: {{ item.assessment.completeness.percentage }}%;" 
+                       aria-valuenow="{{ item.assessment.completeness.percentage }}" 
+                       aria-valuemin="0" 
+                       aria-valuemax="100"></div>
+                </div>
+                <span class="small text-muted fw-semibold">{{ item.assessment.completeness.percentage }}%</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-{{ item.assessment.status_badge }}-subtle text-{{ item.assessment.status_badge }} border border-{{ item.assessment.status_badge }}-subtle">
+                {{ item.assessment.overall_status }}
+              </span>
+            </td>
+            <td class="text-end">
+              <a href="{{ url_for('plot_detail', plot_id=item.plot.plot_id) }}" class="btn btn-outline-primary btn-sm">
+                View Analysis <i class="bi bi-arrow-right"></i>
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" class="text-center py-5 text-muted">
+              <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+              <p class="mb-1 fw-semibold">No records match the selected filter criteria.</p>
+              <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-secondary mt-2">Reset Filters</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

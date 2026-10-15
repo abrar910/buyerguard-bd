@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ app_name }} — {{ tagline }}{% endblock %}</title>
+  <meta name="description" content="BuyerGuard BD is an explainable LandTech prototype for citizen pre-purchase land verification and double-selling detection in Bangladesh.">
+  
+  <!-- Bootstrap 5.3 & Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Mandatory Synthetic Data Banner -->
+  <div class="demo-banner text-center">
+    <div class="container d-flex align-items-center justify-content-center gap-2 flex-wrap">
+      <i class="bi bi-shield-exclamation"></i>
+      <span><strong>{{ demo_disclaimer }}</strong></span>
+      <span class="badge bg-secondary ms-1">LandTech 2026 Prototype</span>
+    </div>
+  </div>
+
+  <!-- Primary Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-custom no-print">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('index') }}">
+        <i class="bi bi-shield-check text-info fs-4"></i>
+        <span>BuyerGuard <span class="text-info">BD</span></span>
+        <span class="brand-badge">P5 Verification</span>
+      </a>
+
+      <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-2 text-white"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1">
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+              <i class="bi bi-house me-1"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'standalone_checklist' %}active{% endif %}" href="{{ url_for('standalone_checklist') }}">
+              <i class="bi bi-check2-square me-1"></i> Citizen Checklist
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <form class="d-flex" action="{{ url_for('search') }}" method="GET" role="search">
+              <div class="input-group input-group-sm">
+                <input class="form-control" type="search" name="q" placeholder="Plot / Deed / Khatian..." aria-label="Search plot" required>
+                <button class="btn btn-teal" type="submit" id="nav-search-btn">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main View Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Application Footer -->
+  <footer class="no-print">
+    <div class="container">
+      <div class="row g-4 mb-4">
+        <div class="col-lg-5">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-shield-check text-info fs-4"></i>
+            <h5 class="text-white mb-0">BuyerGuard BD</h5>
+          </div>
+          <p class="footer-description small pe-lg-4 mb-3">
+            An explainable LandTech educational prototype designed for the LandTech Innovation Hackathon 2026 at Daffodil International University. Focused on Track P5 (Citizen Pre-Purchase Verification) and P3 (Fraud & Double-Selling Detection).
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-dark border border-secondary text-light">Python 3.11</span>
+            <span class="badge bg-dark border border-secondary text-light">Flask</span>
+            <span class="badge bg-dark border border-secondary text-light">SQLite3</span>
+            <span class="badge bg-dark border border-secondary text-light">Deterministic Rules</span>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <h6 class="text-white mb-3">Quick Navigation</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+            <li><a href="{{ url_for('index') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Home Search</a></li>
+            <li><a href="{{ url_for('dashboard') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Records Dashboard</a></li>
+            <li><a href="{{ url_for('standalone_checklist') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Due Diligence Checklist</a></li>
+            <li><a href="{{ url_for('health') }}" target="_blank" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> System Health Check</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-lg-4">
+          <h6 class="text-white mb-3">Responsible Disclaimer</h6>
+          <p class="small footer-disclaimer mb-0">
+            This platform is an educational simulation. It does not interface with the Directorate General of Land Records and Surveys (DGLRS), Land Registration portals, or any official government repository. Always obtain certified records and professional legal counsel before entering land transactions.
+          </p>
+        </div>
+      </div>
+
+      <div class="border-top border-secondary pt-3 text-center footer-copyright small">
+        <p class="mb-0">
+          BuyerGuard BD &copy; {{ current_year }} — LandTech Hackathon 2026 Academic Submission Prototype.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom Client Script -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

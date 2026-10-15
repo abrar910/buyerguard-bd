@@ -1,0 +1,21 @@
+[Unit]
+Description=BuyerGuard BD Flask application
+After=network.target
+
+[Service]
+Type=simple
+User=buyerguard
+Group=buyerguard
+WorkingDirectory=/srv/buyerguard-bd/current
+EnvironmentFile=/etc/buyerguard-bd/buyerguard.env
+ExecStart=/srv/buyerguard-bd/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8000 --access-logfile - --error-logfile - wsgi:app
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/buyerguard-bd/shared
+
+[Install]
+WantedBy=multi-user.target
