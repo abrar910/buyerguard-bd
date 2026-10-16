@@ -17,6 +17,7 @@ from database import (
 )
 from seed_data import seed_database
 from risk_engine import RiskEngine
+from haq_shufa_engine import HaqShufaEngine
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "buyerguard-bd-hackathon-2026-secret")
@@ -205,6 +206,57 @@ def standalone_checklist():
     explaining essential verification stages under Bangladesh land practice.
     """
     return render_template("checklist.html")
+
+
+@app.route("/haq-shufa-guide", methods=["GET", "POST"])
+def haq_shufa_guide():
+    """
+    Haq Shufa Legal Guide & Interactive Pre-Purchase Assessment.
+    Provides educational information on pre-emption rights in Bangladesh
+    under SAT Act 1950 (s.96), NAT Act 1949 (s.24), and Muslim personal law.
+    Supports both interactive client-side and server-side evaluation.
+    """
+    scenarios = HaqShufaEngine.get_synthetic_scenarios()
+    statutes = HaqShufaEngine.VERIFIED_STATUTES
+    assessment = None
+    form_data = {}
+
+    if request.method == "POST":
+        form_data = {
+            "property_type": request.form.get("property_type", ""),
+            "co_ownership": request.form.get("co_ownership", ""),
+            "partition_status": request.form.get("partition_status", ""),
+            "transfer_scope": request.form.get("transfer_scope", ""),
+            "notice_status": request.form.get("notice_status", ""),
+            "easement_status": request.form.get("easement_status", ""),
+        }
+        assessment = HaqShufaEngine.evaluate(form_data)
+    elif request.args.get("scenario"):
+        # Preload synthetic demonstration scenario
+        scenario_id = request.args.get("scenario")
+        selected = next((s for s in scenarios if s["id"] == scenario_id), None)
+        if selected:
+            form_data = selected["data"]
+            assessment = HaqShufaEngine.evaluate(form_data)
+
+    return render_template(
+        "haq_shufa.html",
+        scenarios=scenarios,
+        statutes=statutes,
+        assessment=assessment,
+        form_data=form_data,
+    )
+
+
+@app.route("/api/haq-shufa/evaluate", methods=["POST"])
+def api_haq_shufa_evaluate():
+    """
+    API endpoint for real-time assessment of Haq Shufa questionnaire inputs.
+    Returns JSON evaluation containing informational category, factors, and guidance.
+    """
+    data = request.get_json(silent=True) or request.form.to_dict()
+    result = HaqShufaEngine.evaluate(data)
+    return jsonify(result), 200
 
 
 @app.route("/health")
