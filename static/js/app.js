@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initChecklist();
   initTableQuickSearch();
   initPrintTriggers();
+  initHaqShufaForm();
 });
 
 /**
@@ -142,3 +143,17 @@ function initPrintTriggers() {
     });
   });
 }
+
+/**
+ * Initializes interactive behaviors for the Haq Shufa Assessment form.
+ */
+function initHaqShufaForm() {
+  const resetBtn = document.getElementById("haq-shufa-reset-btn");
+  const resultsCard = document.getElementById("haq-shufa-results-card");
+  if (resetBtn && resultsCard) {
+    resetBtn.addEventListener("click", () => {
+      resultsCard.style.display = "none";
+    });
+  }
+}
+

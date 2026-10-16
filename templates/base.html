@@ -55,6 +55,11 @@
               <i class="bi bi-check2-square me-1"></i> Citizen Checklist
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'haq_shufa_guide' %}active{% endif %}" href="{{ url_for('haq_shufa_guide') }}">
+              <i class="bi bi-book me-1"></i> Haq Shufa Legal Guide
+            </a>
+          </li>
           <li class="nav-item ms-lg-2">
             <form class="d-flex" action="{{ url_for('search') }}" method="GET" role="search">
               <div class="input-group input-group-sm">
@@ -101,6 +106,7 @@
             <li><a href="{{ url_for('index') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Home Search</a></li>
             <li><a href="{{ url_for('dashboard') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Records Dashboard</a></li>
             <li><a href="{{ url_for('standalone_checklist') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Due Diligence Checklist</a></li>
+            <li><a href="{{ url_for('haq_shufa_guide') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Haq Shufa Legal Guide</a></li>
             <li><a href="{{ url_for('health') }}" target="_blank" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> System Health Check</a></li>
           </ul>
         </div>
