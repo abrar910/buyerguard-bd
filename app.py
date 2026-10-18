@@ -5,6 +5,8 @@ LandTech Innovation Hackathon 2026 Prototype
 """
 
 import os
+import secrets
+from urllib.parse import parse_qsl, unquote, urlencode, urlsplit, urlunsplit
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, abort, jsonify, session, g
 
@@ -21,7 +23,46 @@ from haq_shufa_engine import HaqShufaEngine
 from translations import t, get_checklist_items, get_roadmap_items
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "buyerguard-bd-hackathon-2026-secret")
+
+
+def _configured_secret_key(environ=None):
+    """Resolve a session secret without a predictable production fallback."""
+    environ = os.environ if environ is None else environ
+    environment = (environ.get("APP_ENV") or environ.get("FLASK_ENV") or "development").strip().lower()
+    secret_key = environ.get("SECRET_KEY", "").strip()
+    if environment in {"production", "prod"}:
+        if not secret_key or secret_key == "replace-with-a-long-random-value":
+            raise RuntimeError("SECRET_KEY must be explicitly configured in production; replace the example value.")
+        if len(secret_key) < 32:
+            raise RuntimeError("SECRET_KEY must contain at least 32 characters in production.")
+        return secret_key
+
+    # Local development gets a per-process key; automated tests override it with
+    # a stable test-only value in their fixture.
+    return secret_key or secrets.token_hex(32)
+
+
+app.config["SECRET_KEY"] = _configured_secret_key()
+
+
+def _safe_internal_destination(candidate):
+    """Return a safe root-relative destination, or None for malformed/external URLs."""
+    if not isinstance(candidate, str) or not candidate or candidate != candidate.strip():
+        return None
+    if any(ord(char) < 32 or ord(char) == 127 for char in candidate) or "\\" in candidate:
+        return None
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return None
+    decoded_path = unquote(parts.path)
+    # Only root-relative paths are accepted. This avoids scheme-relative URLs,
+    # host confusion, and open redirects while retaining internal query strings.
+    if (parts.scheme or parts.netloc or not parts.path.startswith("/") or parts.path.startswith("//")
+            or decoded_path.startswith("//") or "\\" in decoded_path
+            or any(ord(char) < 32 or ord(char) == 127 for char in decoded_path)):
+        return None
+    return parts
 
 
 # Auto-initialize database on application launch
@@ -71,19 +112,19 @@ def set_language():
         lang = "bn"
     session["lang"] = lang
 
-    next_url = request.args.get("next") or request.referrer or url_for("index")
-    # Clean up any residual lang= query parameter from next_url if present
-    # to avoid overriding subsequent session state
-    if "?" in next_url:
-        parts = next_url.split("?")
-        base_path = parts[0]
-        query_params = [
-            param for param in parts[1].split("&")
-            if not param.startswith("lang=") and param
-        ]
-        next_url = base_path + ("?" + "&".join(query_params) if query_params else "")
+    next_url = request.args.get("next")
+    destination = _safe_internal_destination(next_url) if next_url is not None else None
+    if next_url is None:
+        destination = _safe_internal_destination(request.referrer)
+    if destination is None:
+        return redirect(url_for("index"))
 
-    return redirect(next_url)
+    # Remove any lang query parameter so it cannot override the newly stored
+    # language on the redirected request.
+    query = urlencode([(key, value) for key, value in parse_qsl(destination.query, keep_blank_values=True)
+                       if key != "lang"])
+    target = urlunsplit(("", "", destination.path, query, destination.fragment))
+    return redirect(target)
 
 
 @app.route("/")

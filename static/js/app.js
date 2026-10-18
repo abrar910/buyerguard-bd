@@ -115,19 +115,32 @@ function initTableQuickSearch() {
   const tableBody = document.getElementById("plots-table-body");
   if (!searchInput || !tableBody) return;
 
-  const rows = tableBody.querySelectorAll("tr");
+  const rows = tableBody.querySelectorAll(".plot-record-row");
+  const emptyState = document.getElementById("quick-search-empty");
+  const liveStatus = document.getElementById("table-search-status");
 
   searchInput.addEventListener("input", (e) => {
     const term = e.target.value.toLowerCase().trim();
+    let visibleCount = 0;
 
     rows.forEach((row) => {
       const text = row.textContent.toLowerCase();
       if (text.includes(term)) {
         row.style.display = "";
+        visibleCount += 1;
       } else {
         row.style.display = "none";
       }
     });
+
+    if (emptyState) {
+      emptyState.hidden = term.length === 0 || visibleCount > 0;
+    }
+
+    if (liveStatus) {
+      const label = term ? liveStatus.dataset.matchingLabel : liveStatus.dataset.totalLabel;
+      liveStatus.textContent = `${term ? visibleCount : rows.length} ${label || ""}`.trim();
+    }
   });
 }
 

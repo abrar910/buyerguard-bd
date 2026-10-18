@@ -3,7 +3,7 @@
 {% block title %}{% if current_lang == 'bn' %}প্লট বিবরণী — {{ plot.plot_id }} — {{ app_name }}{% else %}Plot Detail — {{ plot.plot_id }} — {{ app_name }}{% endif %}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 plot-detail-page">
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb mb-2 small text-muted">
@@ -14,12 +14,12 @@
   </nav>
 
   <!-- Page Header -->
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div class="plot-detail-header d-flex flex-column flex-xl-row justify-content-between align-items-xl-center mb-4 gap-3">
     <div>
       <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-        <h2 class="fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
+        <h1 class="plot-detail-title fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
           {% if current_lang == 'bn' %}প্লট রেকর্ড: {{ plot.plot_id }} <span class="small text-muted fw-normal fs-6">({{ plot.mouza_name or plot.demo_mouza_code }})</span>{% else %}Plot Record: {{ plot.plot_id }}{% endif %}
-        </h2>
+        </h1>
         <span class="badge bg-{{ assessment.status_badge }} px-3 py-1 font-monospace">
           {{ assessment.overall_status_display }}
         </span>
@@ -52,12 +52,20 @@
     </div>
   </div>
 
+  <div class="alert plot-data-notice d-flex align-items-start gap-3 mb-4" role="note">
+    <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+    <div>
+      <strong>{% if current_lang == 'bn' %}ডেমো রেকর্ডের সীমা{% else %}Demo record limits{% endif %}</strong>
+      <p class="mb-0 small">{% if current_lang == 'bn' %}এটি প্রদর্শনী ডেটাভিত্তিক একটি প্রাথমিক ঝুঁকি-পর্যালোচনা; সরকারি রেকর্ড, মালিকানা বা আইনি অবস্থা সরাসরি যাচাই করা হয়নি। লেনদেনের আগে সংশ্লিষ্ট দপ্তর ও আইনজীবীর মাধ্যমে যাচাই করুন।{% else %}This preliminary risk review uses demonstration data. Government records, ownership, and legal status have not been officially verified. Confirm with the relevant offices and a qualified lawyer before any transaction.{% endif %}</p>
+    </div>
+  </div>
+
   <!-- EXPLAINABLE VERIFICATION WARNINGS SECTION -->
   <div class="mb-4">
     <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-      <h4 class="fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
+      <h2 class="h4 fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
         <i class="bi bi-cpu text-info me-2"></i> {{ t('plot_rule_findings_title') }}
-      </h4>
+      </h2>
       <div class="d-flex gap-2 align-items-center">
         <span class="badge bg-light text-dark border">
           {{ assessment.warning_count }} {{ t('plot_warning_indicators_evaluated') }}
@@ -97,13 +105,13 @@
       <div class="alert alert-success d-flex align-items-center gap-3 p-3 rounded-3 border-success-subtle">
         <i class="bi bi-check-circle-fill fs-3 text-success"></i>
         <div>
-          <h6 class="fw-bold mb-1">
+          <h3 class="h6 fw-bold mb-1">
             {% if current_lang == 'bn' %}
               কোনো সিমুলেটেড অসঙ্গতি সনাক্ত হয়নি (No Simulated Inconsistencies Detected)
             {% else %}
               No Simulated Inconsistencies Detected in Demo Records
             {% endif %}
-          </h6>
+          </h3>
           <p class="small mb-0 text-secondary">
             {{ t('plot_no_warnings_desc') }}
           </p>
@@ -119,16 +127,16 @@
       <!-- Master Records Card with Sections A through G in exact specified order -->
       <div class="card card-custom mb-4">
         <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-          <span class="fw-bold"><i class="bi bi-folder2-open me-2 text-primary"></i> {{ t('plot_master_card_title') }}</span>
+          <h2 class="h6 fw-bold mb-0"><i class="bi bi-folder2-open me-2 text-primary"></i> {{ t('plot_master_card_title') }}</h2>
           <span class="badge bg-light text-secondary border">A–G Ordered Specifications</span>
         </div>
         <div class="card-body p-4">
 
           <!-- Section A: Basic Land Identification -->
           <div class="mb-4">
-            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+            <h3 class="h6 fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
               <i class="bi bi-geo-alt-fill text-teal me-1"></i> {{ t('sec_a_title') }}
-            </h6>
+            </h3>
             <div class="row g-3">
               <!-- 1. Khatian Number -->
               <div class="col-sm-6 col-md-4">
@@ -172,9 +180,9 @@
 
           <!-- Section B: Deed and Registration Information -->
           <div class="mb-4">
-            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+            <h3 class="h6 fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
               <i class="bi bi-file-earmark-text-fill text-primary me-1"></i> {{ t('sec_b_title') }}
-            </h6>
+            </h3>
             <div class="row g-3">
               <!-- 6. Deed Number (No duplicate deed field) -->
               <div class="col-sm-6 col-md-4">
@@ -204,9 +212,9 @@
 
           <!-- Section C: Mutation Information -->
           <div class="mb-4">
-            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+            <h3 class="h6 fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
               <i class="bi bi-check2-circle text-success me-1"></i> {{ t('sec_c_title') }}
-            </h6>
+            </h3>
             <div class="row g-3">
               <!-- 9. Mutation / E-Namjari Status -->
               <div class="col-12">
@@ -230,9 +238,9 @@
 
           <!-- Section D: Case and Litigation Information -->
           <div class="mb-4">
-            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+            <h3 class="h6 fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
               <i class="bi bi-bank text-danger me-1"></i> {{ t('sec_d_title') }}
-            </h6>
+            </h3>
             <div class="row g-3">
               <!-- 10. Case & Litigation Information -->
               <div class="col-12">
@@ -246,8 +254,9 @@
                     <i class="bi bi-info-circle-fill me-1"></i> {{ plot.case_details or plot.case_info_status }} ({% if current_lang == 'bn' %}আদালত তল্লাশি আবশ্যক{% else %}Court search required{% endif %})
                   </div>
                 {% else %}
-                  <div class="p-2 bg-success-subtle text-success rounded border border-success-subtle small">
-                    <i class="bi bi-shield-check me-1"></i> {{ plot.case_details or plot.case_info_status or t('not_available') }}
+                  <div class="p-2 record-demo-note rounded border small">
+                    <i class="bi bi-info-circle me-1"></i> {{ plot.case_details or plot.case_info_status or t('not_available') }}
+                    <span class="d-block mt-1">{% if current_lang == 'bn' %}ডেমো রেকর্ড; আদালতের পূর্ণাঙ্গ অনুসন্ধান নয়।{% else %}Demo record; this is not a comprehensive court search.{% endif %}</span>
                   </div>
                 {% endif %}
               </div>
@@ -256,9 +265,9 @@
 
           <!-- Section E: Government Interest -->
           <div class="mb-4">
-            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+            <h3 class="h6 fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
               <i class="bi bi-flag-fill text-warning me-1"></i> {{ t('sec_e_title') }}
-            </h6>
+            </h3>
             <div class="row g-3">
               <!-- 11. Government Interest / Khas or Acquired Land -->
               <div class="col-12">
@@ -273,8 +282,9 @@
                     <i class="bi bi-question-circle-fill me-1"></i> {{ plot.gov_interest_details or plot.khas_acquisition_status }} ({% if current_lang == 'bn' %}এসি ল্যান্ড অফিসে যাচাইকরণ আবশ্যক{% else %}AC Land verification required{% endif %})
                   </div>
                 {% else %}
-                  <div class="p-2 bg-success-subtle text-success rounded border border-success-subtle small">
-                    <i class="bi bi-check2-circle me-1"></i> {{ plot.gov_interest_details or plot.khas_acquisition_status or t('not_available') }}
+                  <div class="p-2 record-demo-note rounded border small">
+                    <i class="bi bi-info-circle me-1"></i> {{ plot.gov_interest_details or plot.khas_acquisition_status or t('not_available') }}
+                    <span class="d-block mt-1">{% if current_lang == 'bn' %}ডেমো রেকর্ড; সরকারি দপ্তরে সরাসরি যাচাই করুন।{% else %}Demo record; confirm directly with the relevant government office.{% endif %}</span>
                   </div>
                 {% endif %}
               </div>
@@ -283,9 +293,9 @@
 
           <!-- Section F: Survey Information -->
           <div class="mb-4">
-            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+            <h3 class="h6 fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
               <i class="bi bi-compass text-info me-1"></i> {{ t('sec_f_title') }}
-            </h6>
+            </h3>
             <div class="row g-3">
               <!-- 12. Survey Type -->
               <div class="col-12">
@@ -304,9 +314,9 @@
 
           <!-- Section G: Source of Ownership -->
           <div class="mb-3">
-            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+            <h3 class="h6 fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
               <i class="bi bi-person-badge-fill text-secondary me-1"></i> {{ t('sec_g_title') }}
-            </h6>
+            </h3>
             <div class="row g-3">
               <!-- 13. Source of Ownership -->
               <div class="col-sm-6">
@@ -334,7 +344,7 @@
       <!-- Completeness Scoring Card -->
       <div class="card card-custom mb-4">
         <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-          <span class="fw-bold"><i class="bi bi-pie-chart me-2 text-teal"></i> {{ t('completeness_title') }}</span>
+          <h2 class="h6 fw-bold mb-0"><i class="bi bi-pie-chart me-2 text-teal"></i> {{ t('completeness_title') }}</h2>
           <span class="badge {% if assessment.completeness.is_complete %}bg-success{% else %}bg-warning{% endif %}">
             {{ assessment.completeness.percentage }}%
           </span>
@@ -378,10 +388,10 @@
       <!-- Simulated Transaction History Card with Responsive Wide Table -->
       <div class="card card-custom mb-4">
         <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-          <span class="fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i> {{ t('tx_chain_title') }}</span>
+          <h2 class="h6 fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i> {{ t('tx_chain_title') }}</h2>
           <span class="badge bg-light text-secondary border">{{ transactions|length }} {{ t('tx_chain_records_count') }}</span>
         </div>
-        <div class="table-responsive">
+        <div class="table-responsive" role="region" tabindex="0" aria-label="{% if current_lang == 'bn' %}লেনদেনের ইতিহাসের স্ক্রলযোগ্য সারণি{% else %}Scrollable transaction history table{% endif %}">
           <table class="table table-custom table-hover align-middle mb-0" style="min-width: 620px;">
             <thead>
               <tr>
@@ -433,17 +443,17 @@
     <!-- Right Column: Automated 7-Step Verification Workflow -->
     <div class="col-lg-5">
       {% set due = assessment.due_diligence %}
-      <div class="card card-custom p-4 sticky-top" style="top: 85px;" id="automated-diligence-card">
+      <div class="card card-custom p-4 diligence-panel" id="automated-diligence-card">
         <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
           <div>
-            <span class="fw-bold d-block text-navy" style="color: var(--brand-navy-900);">
+            <h2 class="h6 fw-bold d-block text-navy mb-0" style="color: var(--brand-navy-900);">
               <i class="bi bi-shield-check me-1 text-teal"></i>
               {% if current_lang == 'bn' %}
                 {{ t('auto_checklist_title') }} <span class="small text-muted fw-normal fs-6">(Citizen Pre-Purchase Checklist)</span>
               {% else %}
                 Citizen Pre-Purchase Checklist (7-Step Automated Verification)
               {% endif %}
-            </span>
+            </h2>
             <small class="text-muted">{{ t('auto_checklist_eval_label') }}</small>
           </div>
           <a href="{{ url_for('plot_detail', plot_id=plot.plot_id) }}" class="btn btn-outline-secondary btn-sm" title="{{ t('auto_checklist_rerun') }}">
@@ -477,34 +487,37 @@
         <!-- 7 Automated Diligence Result Items -->
         <div class="d-flex flex-column gap-3">
           {% for check in due.checks %}
-          <div class="p-3 rounded-3 border bg-white shadow-sm" style="border-left: 4px solid var(--bs-{{ check.badge_class }}) !important;">
-            <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
-              <div class="fw-bold text-navy small">
-                {{ check.step_number }}. {{ check.title }}
+          {% set status_class = {'PASS': 'pass', 'WARNING': 'warning', 'NEEDS_REVIEW': 'needs-review', 'INSUFFICIENT_DATA': 'insufficient-data', 'NOT_APPLICABLE': 'not-applicable'}.get(check.status, 'insufficient-data') %}
+          {% set status_icon = {'PASS': 'bi-check-circle-fill', 'WARNING': 'bi-exclamation-octagon-fill', 'NEEDS_REVIEW': 'bi-exclamation-triangle-fill', 'INSUFFICIENT_DATA': 'bi-question-circle-fill', 'NOT_APPLICABLE': 'bi-dash-circle-fill'}.get(check.status, 'bi-question-circle-fill') %}
+          <article class="diligence-check diligence-{{ status_class }}">
+            <div class="diligence-check-heading">
+              <div class="d-flex gap-3 align-items-start">
+                <span class="diligence-step-number" aria-hidden="true">{{ check.step_number_int }}</span>
+                <h3 class="diligence-check-title mb-0">{{ check.title }}</h3>
               </div>
-              <span class="badge bg-{{ check.badge_class }} text-uppercase font-monospace" style="font-size: 0.7rem;">
-                {{ check.status_label }}
+              <span class="diligence-status" aria-label="{{ check.status_label }}">
+                <i class="bi {{ status_icon }}" aria-hidden="true"></i> {{ check.status_label }}
               </span>
             </div>
 
-            <p class="text-secondary small mb-2" style="font-size: 0.8rem; line-height: 1.4;">
-              {{ check.explanation }}
-            </p>
+            <div class="diligence-explanation">
+              <span class="diligence-field-label">{% if current_lang == 'bn' %}ব্যাখ্যা{% else %}Explanation{% endif %}</span>
+              <p class="mb-0">{{ check.explanation }}</p>
+            </div>
 
-            {% if check.conflicts %}
-              <div class="mb-2 p-2 bg-danger-subtle text-danger rounded border border-danger-subtle" style="font-size: 0.775rem;">
-                <strong><i class="bi bi-exclamation-diamond me-1"></i> {{ t('auto_checklist_detected_conflicts') }}</strong> {{ check.conflicts }}
+            <div class="diligence-detail-grid">
+              <div class="diligence-detail diligence-conflicts">
+                <span class="diligence-field-label"><i class="bi bi-exclamation-diamond me-1" aria-hidden="true"></i>{{ t('auto_checklist_detected_conflicts') }}</span>
+                <p class="mb-0">{% if check.conflicts %}{{ check.conflicts }}{% else %}{% if current_lang == 'bn' %}এই পরীক্ষায় কোনো দ্বন্দ্ব উল্লেখ নেই।{% else %}No conflicts reported for this check.{% endif %}{% endif %}</p>
               </div>
-            {% endif %}
-
-            {% if check.missing_info %}
-              <div class="mb-2 p-2 bg-warning-subtle text-warning-emphasis rounded border border-warning-subtle" style="font-size: 0.775rem;">
-                <strong><i class="bi bi-info-circle me-1"></i> {{ t('auto_checklist_missing_docs') }}</strong> {{ check.missing_info }}
+              <div class="diligence-detail diligence-missing">
+                <span class="diligence-field-label"><i class="bi bi-file-earmark-minus me-1" aria-hidden="true"></i>{{ t('auto_checklist_missing_docs') }}</span>
+                <p class="mb-0">{% if check.missing_info %}{{ check.missing_info }}{% else %}{% if current_lang == 'bn' %}এই পরীক্ষায় কোনো অনুপস্থিত তথ্য উল্লেখ নেই।{% else %}No missing information reported for this check.{% endif %}{% endif %}</p>
               </div>
-            {% endif %}
+            </div>
 
             {% if check.check_id == 'step_7_legal_readiness' %}
-              <div class="p-2 mb-2 bg-light rounded border text-navy fw-semibold small">
+              <div class="diligence-detail diligence-readiness mb-2 text-navy fw-semibold small">
                 <i class="bi bi-briefcase me-1 text-primary"></i>
                 {% if current_lang == 'bn' %}মূল্যায়ন ফলাফল:{% else %}Assessment Outcome:{% endif %}
                 <span class="badge bg-{{ check.badge_class }} ms-1">{{ check.readiness_outcome }}</span>
@@ -514,11 +527,11 @@
               </div>
             {% endif %}
 
-            <div class="pt-2 border-top text-dark" style="font-size: 0.775rem;">
-              <span class="text-muted">{{ t('auto_checklist_recommended_action') }}</span>
-              <span class="fw-semibold">{{ check.recommended_action }}</span>
+            <div class="diligence-action">
+              <span class="diligence-field-label"><i class="bi bi-arrow-right-circle me-1" aria-hidden="true"></i>{{ t('auto_checklist_recommended_action') }}</span>
+              <p class="mb-0 fw-semibold">{{ check.recommended_action }}</p>
             </div>
-          </div>
+          </article>
           {% endfor %}
         </div>
 

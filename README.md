@@ -52,7 +52,8 @@
 
 6. **উন্নত নাগরিক প্রাক-ক্রয় চেকলিস্ট (`/checklist`):**
    - ফুল-উইডথ রেসপনসিভ লেআউট সহ ৭-দফা বাস্তবসম্মত অনুসন্ধান নির্দেশিকা।
-   - সম্পন্নতার অগ্রগতি ও চেকবক্সের অবস্থা ব্রাউজারের `localStorage`-এ স্থানীয়ভাবে সংরক্ষিত থাকে।
+   - নির্বাচিত ডেমো প্লটের তথ্য থেকে তৈরি সাতটি স্বয়ংক্রিয় যাচাই ফলাফল, প্রতিটির অবস্থা, ব্যাখ্যা, দ্বন্দ্ব, অনুপস্থিত তথ্য ও পরবর্তী পদক্ষেপ দেখায়।
+   - অনুপস্থিত তথ্যকে উত্তীর্ণ ফলাফল হিসেবে দেখায় না; ফলাফল সরকারি যাচাই বা আইনি নিশ্চয়তা নয়।
 
 7. **হক শুফা বা অগ্রক্রয়াধিকার আইনি নির্দেশিকা (`/haq-shufa-guide`):**
    - *State Acquisition and Tenancy Act, 1950* (Section 96), *Non-Agricultural Tenancy Act, 1949* (Section 24), এবং মুসলিম ব্যক্তিগত আইনের ভিত্তিতে ইন্টারেক্টিভ আইনি সচেতনতা টুল।
@@ -148,51 +149,9 @@ python app.py
 pytest -v
 ```
 
-### যাচাইকৃত টেস্ট ফলাফল (Verified 40 Passing Tests):
-```
-tests/test_app.py::test_landing_page PASSED                              [  2%]
-tests/test_app.py::test_dashboard_statistics PASSED                      [  5%]
-tests/test_app.py::test_search_known_plot PASSED                         [  7%]
-tests/test_app.py::test_search_unknown_plot_not_found_state PASSED       [ 10%]
-tests/test_app.py::test_clean_plot_detail PASSED                         [ 12%]
-tests/test_app.py::test_missing_mutation_scenario PASSED                 [ 15%]
-tests/test_app.py::test_missing_deed_scenario PASSED                     [ 17%]
-tests/test_app.py::test_duplicate_sale_scenario PASSED                   [ 20%]
-tests/test_app.py::test_mismatch_reference_scenario PASSED               [ 22%]
-tests/test_app.py::test_unknown_case_scenario PASSED                     [ 25%]
-tests/test_app.py::test_unknown_khas_scenario PASSED                     [ 27%]
-tests/test_app.py::test_multi_warning_scenario PASSED                    [ 30%]
-tests/test_app.py::test_printable_report PASSED                          [ 32%]
-tests/test_app.py::test_standalone_checklist PASSED                      [ 35%]
-tests/test_app.py::test_health_endpoint PASSED                           [ 37%]
-tests/test_app.py::test_invalid_plot_returns_404 PASSED                  [ 40%]
-tests/test_app.py::test_custom_404_page PASSED                           [ 42%]
-tests/test_app.py::test_language_toggle_and_persistence PASSED           [ 45%]
-tests/test_app.py::test_no_official_government_claims PASSED             [ 47%]
-tests/test_app.py::test_custom_404_page_bilingual PASSED                 [ 50%]
-tests/test_app.py::test_plot_detail_responsive_tables_and_safe_disclaimers PASSED [ 52%]
-tests/test_haq_shufa.py::test_haq_shufa_route_renders_successfully PASSED [ 55%]
-tests/test_haq_shufa.py::test_haq_shufa_navigation_presence PASSED       [ 57%]
-tests/test_haq_shufa.py::test_haq_shufa_scenario_1_preload PASSED        [ 60%]
-tests/test_haq_shufa.py::test_haq_shufa_scenario_2_preload PASSED        [ 62%]
-tests/test_haq_shufa.py::test_haq_shufa_scenario_3_preload PASSED        [ 65%]
-tests/test_haq_shufa.py::test_haq_shufa_post_form_evaluation PASSED      [ 67%]
-tests/test_haq_shufa.py::test_haq_shufa_api_evaluation PASSED            [ 70%]
-tests/test_haq_shufa.py::test_haq_shufa_engine_unit_tests PASSED         [ 72%]
-tests/test_haq_shufa.py::test_haq_shufa_no_forbidden_government_claims PASSED [ 75%]
-tests/test_haq_shufa.py::test_entire_site_has_bengali_primary_language PASSED [ 77%]
-tests/test_haq_shufa.py::test_bengali_headings_and_disclaimers PASSED    [ 80%]
-tests/test_risk_engine.py::test_clean_plot_evaluation PASSED             [ 82%]
-tests/test_risk_engine.py::test_missing_mutation_warning PASSED          [ 85%]
-tests/test_risk_engine.py::test_missing_deed_ref_warning PASSED          [ 87%]
-tests/test_risk_engine.py::test_duplicate_sale_conflict_warning PASSED   [ 90%]
-tests/test_risk_engine.py::test_legitimate_historical_chain_does_not_trigger_duplicate_sale PASSED [ 92%]
-tests/test_risk_engine.py::test_superseded_conflict_marker_does_not_trigger_duplicate_sale PASSED [ 95%]
-tests/test_risk_engine.py::test_inconsistent_reference_warning PASSED    [ 97%]
-tests/test_risk_engine.py::test_unknown_case_and_khas_warnings PASSED    [100%]
+### Latest verified test result
 
-============================== 40 passed in 0.26s ==============================
-```
+The most recent full run reported **69 passed**. Re-run `pytest -v` to verify the current checkout.
 
 ---
 
@@ -242,9 +201,9 @@ tests/test_risk_engine.py::test_unknown_case_and_khas_warnings PASSED    [100%]
 
 - **প্যারামিটারাইজড এসকিউএল (Parameterized Queries):** এসকিউএল ইনজেকশন প্রতিরোধে সকল ডাটাবেজ কুয়েরিতে প্যারামিটার বাইন্ডিং নিশ্চিত করা হয়েছে।
 - **নিরাপদ টেমপ্লেট রেন্ডারিং (Safe Template Rendering):** ক্রস-সাইট স্ক্রিপ্টিং (XSS) প্রতিরোধে Jinja2-এর অটো-এসকেপিং সক্রিয়।
-- **তথ্য গোপনীয়তা (Privacy Protection):** ব্যবহারকারীর কোনো ব্যক্তিগত সংবেদনশীল তথ্য সার্ভারে জমা রাখা হয় না; চেকলিস্টটি সম্পূর্ণরূপে ব্রাউজারের লোকাল স্টোরেজে সংরক্ষিত থাকে।
+- **তথ্য গোপনীয়তা (Privacy Protection):** ডেমো যাচাই ফলাফল নির্বাচিত কাল্পনিক প্লট রেকর্ড থেকে তৈরি হয়; অ্যাপ্লিকেশন কোনো ব্যক্তিগত পরিচয়-সংক্রান্ত তথ্য সংরক্ষণের দাবি করে না।
 - **নিরাপদ রিডাইরেক্ট (Open Redirect Prevention):** ভাষা পরিবর্তন রুটে (`/set-language`) কেবলমাত্র লোকাল রিলেটিভ পাথেই রিডাইরেকশন অনুমোদিত।
-- **উৎপাদন নিরাপত্তা (Production Security):** গোপন কি (`SECRET_KEY`) পরিবেশ ভেরিয়েবল থেকে লোড করা হয়।
+- **উৎপাদন নিরাপত্তা (Production Security):** production mode-এ অন্তত ৩২ অক্ষরের `SECRET_KEY` বাধ্যতামূলক; অনুপস্থিত, ছোট বা উদাহরণ placeholder key-তে অ্যাপ চালু হয় না।
 
 ---
 

@@ -13,6 +13,7 @@ from haq_shufa_engine import HaqShufaEngine
 def client():
     """Configure Flask test client with test mode."""
     app.config["TESTING"] = True
+    app.config["SECRET_KEY"] = "buyer-guard-test-only-secret"
     with app.test_client() as client:
         yield client
 
