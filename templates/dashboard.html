@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Records Dashboard — {{ app_name }}{% endblock %}
+{% block title %}{% if current_lang == 'bn' %}রেকর্ড ড্যাশবোর্ড — {{ app_name }}{% else %}Records Dashboard — {{ app_name }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -9,24 +9,24 @@
     <div>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-1 small text-muted">
-          <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+          <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">{{ t('nav_home') }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ t('nav_dashboard') }}</li>
         </ol>
       </nav>
       <h2 class="fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
-        Synthetic Land Records Dashboard
+        {{ t('dash_title') }}
       </h2>
       <p class="text-muted small mb-0">
-        Calculated live from SQLite database and deterministic Risk Engine.
+        {{ t('dash_subtitle') }}
       </p>
     </div>
 
     <div class="d-flex gap-2">
       <a href="{{ url_for('standalone_checklist') }}" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-card-checklist me-1"></i> Pre-Purchase Checklist
+        <i class="bi bi-card-checklist me-1"></i> {{ t('dash_btn_checklist') }}
       </a>
       <a href="{{ url_for('index') }}" class="btn btn-teal btn-sm">
-        <i class="bi bi-search me-1"></i> New Search
+        <i class="bi bi-search me-1"></i> {{ t('dash_btn_search') }}
       </a>
     </div>
   </div>
@@ -40,7 +40,9 @@
         </div>
         <div>
           <div class="stat-value">{{ stats.total_plots }}</div>
-          <div class="stat-label">Total Demo Plots</div>
+          <div class="stat-label">
+            {% if current_lang == 'bn' %}মোট ডেমো প্লট{% else %}Total Demo Plots{% endif %}
+          </div>
         </div>
       </div>
     </div>
@@ -52,7 +54,9 @@
         </div>
         <div>
           <div class="stat-value">{{ stats.plots_review_needed }}</div>
-          <div class="stat-label">Flags / Review Needed</div>
+          <div class="stat-label">
+            {% if current_lang == 'bn' %}পর্যালোচনা প্রয়োজন{% else %}Review Recommended{% endif %}
+          </div>
         </div>
       </div>
     </div>
@@ -64,7 +68,9 @@
         </div>
         <div>
           <div class="stat-value">{{ stats.duplicate_sale_conflicts }}</div>
-          <div class="stat-label">Duplicate Sale Conflicts</div>
+          <div class="stat-label">
+            {% if current_lang == 'bn' %}দ্বৈত-বিক্রয় বিরোধ{% else %}Duplicate Sale Conflicts{% endif %}
+          </div>
         </div>
       </div>
     </div>
@@ -76,7 +82,9 @@
         </div>
         <div>
           <div class="stat-value">{{ stats.incomplete_records }}</div>
-          <div class="stat-label">Incomplete Records</div>
+          <div class="stat-label">
+            {% if current_lang == 'bn' %}অসম্পূর্ণ রেকর্ড{% else %}Incomplete Records{% endif %}
+          </div>
         </div>
       </div>
     </div>
@@ -89,7 +97,7 @@
         <div class="col-12 col-md-4">
           <div class="input-group input-group-sm">
             <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-filter"></i></span>
-            <input type="text" id="table-quick-search" class="form-control border-start-0" placeholder="Filter visible records...">
+            <input type="text" id="table-quick-search" class="form-control border-start-0" placeholder="{{ t('dash_quick_search_placeholder') }}">
           </div>
         </div>
 
@@ -97,23 +105,37 @@
           <!-- Status Filter -->
           <form method="GET" action="{{ url_for('dashboard') }}" class="d-flex flex-wrap align-items-center gap-2">
             <select name="status" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-              <option value="">All Review Statuses</option>
-              <option value="No Demo Flags Detected" {% if selected_status == 'No Demo Flags Detected' %}selected{% endif %}>No Flags Detected</option>
-              <option value="Review Needed" {% if selected_status == 'Review Needed' %}selected{% endif %}>Review Needed</option>
-              <option value="Potential Inconsistency" {% if selected_status == 'Potential Inconsistency' %}selected{% endif %}>Potential Inconsistency</option>
-              <option value="Information Incomplete" {% if selected_status == 'Information Incomplete' %}selected{% endif %}>Information Incomplete</option>
+              <option value="">{% if current_lang == 'bn' %}সকল মূল্যায়ন স্ট্যাটাস{% else %}All Evaluation Statuses{% endif %}</option>
+              <option value="No Demo Flags Detected" {% if selected_status == 'No Demo Flags Detected' %}selected{% endif %}>
+                {% if current_lang == 'bn' %}কোনো অসঙ্গতি পাওয়া যায়নি{% else %}No Flags in Demo Data{% endif %}
+              </option>
+              <option value="Review Needed" {% if selected_status == 'Review Needed' %}selected{% endif %}>
+                {% if current_lang == 'bn' %}পর্যালোচনা প্রয়োজন{% else %}Review Recommended{% endif %}
+              </option>
+              <option value="Potential Inconsistency" {% if selected_status == 'Potential Inconsistency' %}selected{% endif %}>
+                {% if current_lang == 'bn' %}সম্ভাব্য অসঙ্গতি{% else %}Potential Inconsistency{% endif %}
+              </option>
+              <option value="Information Incomplete" {% if selected_status == 'Information Incomplete' %}selected{% endif %}>
+                {% if current_lang == 'bn' %}তথ্য অপূর্ণাঙ্গ{% else %}Information Incomplete{% endif %}
+              </option>
             </select>
 
             <select name="mutation" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-              <option value="">All Mutation Statuses</option>
-              <option value="mutated" {% if selected_mutation == 'mutated' %}selected{% endif %}>Mutated (Namjari)</option>
-              <option value="pending" {% if selected_mutation == 'pending' %}selected{% endif %}>Pending Application</option>
-              <option value="missing" {% if selected_mutation == 'missing' %}selected{% endif %}>Missing Record</option>
+              <option value="">{% if current_lang == 'bn' %}সকল নামজারি অবস্থা{% else %}All Mutation Statuses{% endif %}</option>
+              <option value="mutated" {% if selected_mutation == 'mutated' %}selected{% endif %}>
+                {% if current_lang == 'bn' %}নামজারি সম্পন্ন{% else %}Mutated (Namjari Complete){% endif %}
+              </option>
+              <option value="pending" {% if selected_mutation == 'pending' %}selected{% endif %}>
+                {% if current_lang == 'bn' %}প্রক্রিয়াধীন{% else %}Pending Mutation{% endif %}
+              </option>
+              <option value="missing" {% if selected_mutation == 'missing' %}selected{% endif %}>
+                {% if current_lang == 'bn' %}রেকর্ড অনুপস্থিত{% else %}Missing Mutation Record{% endif %}
+              </option>
             </select>
 
             {% if selected_status or selected_mutation %}
-              <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm" title="Clear Filters">
-                <i class="bi bi-x-circle"></i> Clear
+              <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm" title="{% if current_lang == 'bn' %}ফিল্টার রিসেট{% else %}Reset Filter{% endif %}">
+                <i class="bi bi-x-circle"></i> {% if current_lang == 'bn' %}ফিল্টার মুছুন{% else %}Clear Filter{% endif %}
               </a>
             {% endif %}
           </form>
@@ -125,14 +147,14 @@
       <table class="table table-custom table-hover align-middle">
         <thead>
           <tr>
-            <th>Plot Identifier</th>
-            <th>Location Details</th>
-            <th>Khatian Ref</th>
-            <th>Deed Ref</th>
-            <th>Mutation Status</th>
-            <th style="min-width: 130px;">Completeness</th>
-            <th>Evaluation Status</th>
-            <th class="text-end">Actions</th>
+            <th>{{ t('dash_th_plot_id') }}</th>
+            <th>{{ t('dash_th_area') }}</th>
+            <th>{{ t('dash_th_khatian') }}</th>
+            <th>{{ t('dash_th_deed') }}</th>
+            <th>{{ t('dash_th_mutation') }}</th>
+            <th style="min-width: 130px;">{{ t('dash_th_completeness') }}</th>
+            <th>{{ t('dash_th_status') }}</th>
+            <th class="text-end">{{ t('dash_th_actions') }}</th>
           </tr>
         </thead>
         <tbody id="plots-table-body">
@@ -143,8 +165,8 @@
                 {{ item.plot.plot_id }}
               </a>
               {% if item.assessment.has_duplicate_conflict %}
-                <span class="badge bg-danger ms-1" title="Duplicate Sale Anomaly Detected">
-                  <i class="bi bi-shield-x"></i> Conflict
+                <span class="badge bg-danger ms-1" title="{% if current_lang == 'bn' %}দ্বৈত-বিক্রয়ের অসঙ্গতি সনাক্ত{% else %}Duplicate sale conflict detected{% endif %}">
+                  <i class="bi bi-shield-x"></i> {% if current_lang == 'bn' %}বিরোধ{% else %}Conflict{% endif %}
                 </span>
               {% endif %}
             </td>
@@ -156,28 +178,32 @@
               {% if item.plot.khatian_ref %}
                 <span class="badge bg-light text-dark border">{{ item.plot.khatian_ref }}</span>
               {% else %}
-                <span class="badge bg-warning-subtle text-warning border border-warning">Missing</span>
+                <span class="badge bg-warning-subtle text-warning border border-warning">
+                  {% if current_lang == 'bn' %}অনুপস্থিত{% else %}Missing{% endif %}
+                </span>
               {% endif %}
             </td>
             <td>
               {% if item.plot.deed_ref %}
                 <code class="small text-secondary">{{ item.plot.deed_ref }}</code>
               {% else %}
-                <span class="badge bg-warning-subtle text-warning border border-warning">Not Provided</span>
+                <span class="badge bg-warning-subtle text-warning border border-warning">
+                  {% if current_lang == 'bn' %}অপ্রাপ্ত{% else %}Not Provided{% endif %}
+                </span>
               {% endif %}
             </td>
             <td>
               {% if 'mutated' in (item.plot.mutation_status or '')|lower %}
                 <span class="badge bg-success-subtle text-success border border-success-subtle">
-                  <i class="bi bi-check-circle"></i> Mutated
+                  <i class="bi bi-check-circle"></i> {% if current_lang == 'bn' %}নামজারি সম্পন্ন{% else %}Mutated{% endif %}
                 </span>
               {% elif 'pending' in (item.plot.mutation_status or '')|lower %}
                 <span class="badge bg-info-subtle text-info border border-info-subtle">
-                  <i class="bi bi-hourglass-split"></i> Pending
+                  <i class="bi bi-hourglass-split"></i> {% if current_lang == 'bn' %}প্রক্রিয়াধীন{% else %}Pending{% endif %}
                 </span>
               {% else %}
                 <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
-                  <i class="bi bi-exclamation-circle"></i> Missing
+                  <i class="bi bi-exclamation-circle"></i> {% if current_lang == 'bn' %}অনুপস্থিত{% else %}Missing{% endif %}
                 </span>
               {% endif %}
             </td>
@@ -196,12 +222,12 @@
             </td>
             <td>
               <span class="badge bg-{{ item.assessment.status_badge }}-subtle text-{{ item.assessment.status_badge }} border border-{{ item.assessment.status_badge }}-subtle">
-                {{ item.assessment.overall_status }}
+                {{ item.assessment.overall_status_display }}
               </span>
             </td>
             <td class="text-end">
               <a href="{{ url_for('plot_detail', plot_id=item.plot.plot_id) }}" class="btn btn-outline-primary btn-sm">
-                View Analysis <i class="bi bi-arrow-right"></i>
+                {{ t('dash_btn_view') }} <i class="bi bi-arrow-right"></i>
               </a>
             </td>
           </tr>
@@ -209,8 +235,10 @@
           <tr>
             <td colspan="8" class="text-center py-5 text-muted">
               <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-              <p class="mb-1 fw-semibold">No records match the selected filter criteria.</p>
-              <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-secondary mt-2">Reset Filters</a>
+              <p class="mb-1 fw-semibold">{{ t('dash_empty_table') }}</p>
+              <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-secondary mt-2">
+                {% if current_lang == 'bn' %}ফিল্টার রিসেট করুন{% else %}Reset Filters{% endif %}
+              </a>
             </td>
           </tr>
           {% endfor %}

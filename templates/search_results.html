@@ -1,24 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}Search Results for "{{ query }}" — {{ app_name }}{% endblock %}
+{% block title %}{% if current_lang == 'bn' %}অনুসন্ধানের ফলাফল: "{{ query }}" — {{ app_name }}{% else %}Search Results: "{{ query }}" — {{ app_name }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb mb-2 small text-muted">
-      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="text-decoration-none">Dashboard</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Search Results</li>
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">{{ t('nav_home') }}</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="text-decoration-none">{{ t('nav_dashboard') }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ t('search_results_title') }}</li>
     </ol>
   </nav>
 
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
     <div>
       <h2 class="fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
-        Search Results
+        {{ t('search_results_title') }}
       </h2>
       <p class="text-muted small mb-0">
-        Found <strong>{{ count }}</strong> matching demonstration record{% if count != 1 %}s{% endif %} for query <span class="badge bg-light text-dark border">"{{ query }}"</span>
+        {% if current_lang == 'bn' %}
+          অনুসন্ধান কুয়েরি <span class="badge bg-light text-dark border">"{{ query }}"</span>-এর জন্য <strong>{{ count }}</strong>টি ডেমো রেকর্ড পাওয়া গেছে
+        {% else %}
+          Found <strong>{{ count }}</strong> demonstration record(s) matching <span class="badge bg-light text-dark border">"{{ query }}"</span>
+        {% endif %}
       </p>
     </div>
 
@@ -26,8 +30,8 @@
     <div style="min-width: 280px;">
       <form action="{{ url_for('search') }}" method="GET">
         <div class="input-group input-group-sm">
-          <input type="text" name="q" class="form-control" placeholder="Search another plot..." value="{{ query }}">
-          <button class="btn btn-teal" type="submit">Search</button>
+          <input type="text" name="q" class="form-control" placeholder="{% if current_lang == 'bn' %}অন্য কোনো প্লট অনুসন্ধান করুন...{% else %}Search another demo plot...{% endif %}" value="{{ query }}">
+          <button class="btn btn-teal" type="submit">{{ t('nav_search_btn_title') }}</button>
         </div>
       </form>
     </div>
@@ -45,7 +49,9 @@
                   {{ item.plot.plot_id }}
                 </a>
                 {% if item.assessment.has_duplicate_conflict %}
-                  <span class="badge bg-danger">Conflict</span>
+                  <span class="badge bg-danger">
+                    {% if current_lang == 'bn' %}বিরোধ সনাক্ত{% else %}Conflict Flagged{% endif %}
+                  </span>
                 {% endif %}
               </div>
               <div class="plot-location small text-muted">
@@ -59,39 +65,43 @@
             <div class="col-md-4">
               <div class="row g-2 small">
                 <div class="col-6">
-                  <span class="text-muted d-block">Deed Ref:</span>
-                  <strong>{{ item.plot.deed_ref or 'Not Provided' }}</strong>
+                  <span class="text-muted d-block">{% if current_lang == 'bn' %}দলিল নম্বর:{% else %}Deed Reference:{% endif %}</span>
+                  <strong>{{ item.plot.deed_ref or t('not_available') }}</strong>
                 </div>
                 <div class="col-6">
-                  <span class="text-muted d-block">Khatian Ref:</span>
-                  <strong>{{ item.plot.khatian_ref or 'Missing' }}</strong>
+                  <span class="text-muted d-block">{% if current_lang == 'bn' %}খতিয়ান নম্বর:{% else %}Khatian Reference:{% endif %}</span>
+                  <strong>{{ item.plot.khatian_ref or t('not_available') }}</strong>
                 </div>
                 <div class="col-12 mt-1">
-                  <span class="text-muted d-block">Mutation:</span>
-                  <span class="fw-semibold">{{ item.plot.mutation_status or 'Not Available' }}</span>
+                  <span class="text-muted d-block">{% if current_lang == 'bn' %}নামজারি অবস্থা:{% else %}Mutation Status:{% endif %}</span>
+                  <span class="fw-semibold">{{ item.plot.mutation_status or t('not_available') }}</span>
                 </div>
               </div>
             </div>
 
             <div class="col-md-3">
-              <span class="text-muted small d-block mb-1">Rule Engine Evaluation:</span>
+              <span class="text-muted small d-block mb-1">
+                {% if current_lang == 'bn' %}রুল ইঞ্জিন মূল্যায়ন:{% else %}Rule Engine Evaluation:{% endif %}
+              </span>
               <span class="badge bg-{{ item.assessment.status_badge }}-subtle text-{{ item.assessment.status_badge }} border border-{{ item.assessment.status_badge }}-subtle mb-2">
-                {{ item.assessment.overall_status }}
+                {{ item.assessment.overall_status_display }}
               </span>
               {% if item.assessment.warning_count > 0 %}
                 <div class="small text-danger">
-                  <i class="bi bi-exclamation-triangle"></i> {{ item.assessment.warning_count }} flag(s) identified
+                  <i class="bi bi-exclamation-triangle"></i>
+                  {% if current_lang == 'bn' %}{{ item.assessment.warning_count }}টি সতর্কতা নির্দেশক{% else %}{{ item.assessment.warning_count }} warning indicator(s){% endif %}
                 </div>
               {% else %}
                 <div class="small text-success">
-                  <i class="bi bi-check-circle"></i> Clean demonstration record
+                  <i class="bi bi-check-circle"></i>
+                  {% if current_lang == 'bn' %}ডেমো ডেটায় কোনো অসঙ্গতি নেই{% else %}No demo warning flags{% endif %}
                 </div>
               {% endif %}
             </div>
 
             <div class="col-md-2 text-md-end">
               <a href="{{ url_for('plot_detail', plot_id=item.plot.plot_id) }}" class="btn btn-teal btn-sm w-100 w-md-auto">
-                View Details <i class="bi bi-chevron-right ms-1"></i>
+                {{ t('dash_btn_view') }} <i class="bi bi-chevron-right ms-1"></i>
               </a>
             </div>
           </div>
@@ -105,26 +115,41 @@
       <div class="stat-icon warning mx-auto mb-3" style="width: 64px; height: 64px; font-size: 2rem;">
         <i class="bi bi-search"></i>
       </div>
-      <h4 class="fw-bold text-navy" style="color: var(--brand-navy-900);">No Demonstration Records Found</h4>
+      <h4 class="fw-bold text-navy" style="color: var(--brand-navy-900);">
+        {% if current_lang == 'bn' %}
+          কোনো প্রদর্শনী রেকর্ড খুঁজে পাওয়া যায়নি (No Demonstration Records Found)
+        {% else %}
+          No Demonstration Records Found
+        {% endif %}
+      </h4>
       <p class="text-muted max-w-600 mx-auto mb-4">
-        We could not find any synthetic plot matching "<strong>{{ query }}</strong>" in our local SQLite database.
-        Please ensure you are searching by an exact or partial synthetic reference.
+        {% if current_lang == 'bn' %}
+          আমাদের লোকাল SQLite ডেটাবেজে "<strong>{{ query }}</strong>"-এর সাথে মিল রয়েছে এমন কোনো কাল্পনিক রেকর্ড পাওয়া যায়নি। অনুগ্রহ করে সঠিক ডেমো রেফারেন্স দিয়ে অনুসন্ধান করুন।
+        {% else %}
+          No synthetic records matching "<strong>{{ query }}</strong>" were located in the local SQLite database. Please search using a valid demonstration reference.
+        {% endif %}
       </p>
 
       <div class="p-3 bg-light rounded-3 d-inline-block text-start mx-auto mb-4 border">
-        <span class="fw-bold small d-block mb-2 text-secondary">Try searching for these available demo plots:</span>
+        <span class="fw-bold small d-block mb-2 text-secondary">
+          {% if current_lang == 'bn' %}
+            উপলব্ধ ডেমো প্লটগুলো দিয়ে পরীক্ষা করে দেখুন (Try searching for these available demo plots):
+          {% else %}
+            Try searching for these available demo plots:
+          {% endif %}
+        </span>
         <div class="d-flex flex-wrap gap-2">
-          <a href="{{ url_for('search', q='PLOT-1001') }}" class="btn btn-sm btn-outline-primary">PLOT-1001 (Clean Title)</a>
-          <a href="{{ url_for('search', q='PLOT-1004') }}" class="btn btn-sm btn-outline-danger">PLOT-1004 (Double Sale)</a>
-          <a href="{{ url_for('search', q='PLOT-1002') }}" class="btn btn-sm btn-outline-warning">PLOT-1002 (Missing Mutation)</a>
-          <a href="{{ url_for('search', q='PLOT-1005') }}" class="btn btn-sm btn-outline-secondary">PLOT-1005 (Mismatch)</a>
+          <a href="{{ url_for('search', q='PLOT-1001') }}" class="btn btn-sm btn-outline-primary">PLOT-1001 ({% if current_lang == 'bn' %}সতর্কতাহীন ডেমো{% else %}No Demo Flags{% endif %})</a>
+          <a href="{{ url_for('search', q='PLOT-1004') }}" class="btn btn-sm btn-outline-danger">PLOT-1004 ({% if current_lang == 'bn' %}দ্বৈত-বিক্রয়ের বিরোধ{% else %}Double Sale Conflict{% endif %})</a>
+          <a href="{{ url_for('search', q='PLOT-1002') }}" class="btn btn-sm btn-outline-warning">PLOT-1002 ({% if current_lang == 'bn' %}নামজারি অনুপস্থিত{% else %}Missing Mutation{% endif %})</a>
+          <a href="{{ url_for('search', q='PLOT-1005') }}" class="btn btn-sm btn-outline-secondary">PLOT-1005 ({% if current_lang == 'bn' %}দলিল গরমিল{% else %}Deed Mismatch{% endif %})</a>
           <a href="{{ url_for('search', q='DEMO-MOUZA-01') }}" class="btn btn-sm btn-outline-info">DEMO-MOUZA-01</a>
         </div>
       </div>
 
       <div>
         <a href="{{ url_for('dashboard') }}" class="btn btn-primary-custom">
-          <i class="bi bi-grid-3x3-gap me-2"></i> Browse Complete Records Table
+          <i class="bi bi-grid-3x3-gap me-2"></i> {{ t('search_btn_all_records') }}
         </a>
       </div>
     </div>

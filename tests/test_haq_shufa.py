@@ -18,17 +18,15 @@ def client():
 
 
 def test_haq_shufa_route_renders_successfully(client):
-    """Test /haq-shufa-guide GET renders English legal guide, statutory links, and questionnaire."""
+    """Test /haq-shufa-guide GET renders legal guide, statutory links, and questionnaire in Bangla and English."""
+    # Bangla default
     response = client.get("/haq-shufa-guide")
     assert response.status_code == 200
     html = response.get_data(as_text=True)
 
-    # Branding & English titles
-    assert "Haq Shufa Legal Guide" in html
-    assert "Right of Pre-emption" in html
-    assert "Section 96" in html
+    assert '<html lang="bn">' in html
+    assert "হক শুফা" in html
     assert "SAT Act" in html
-    assert "Section 24" in html
     assert "NAT Act" in html
     assert "Muslim Personal Law" in html
 
@@ -36,19 +34,34 @@ def test_haq_shufa_route_renders_successfully(client):
     assert "http://bdlaws.minlaw.gov.bd/act-241/section-8698.html" in html
     assert "http://bdlaws.minlaw.gov.bd/act-231/section-8479.html" in html
 
-    # Educational scope warning
-    assert "does not replace qualified legal advice" in html
-    assert "Advocate" in html
+    # English mode
+    res_en = client.get("/haq-shufa-guide?lang=en")
+    assert res_en.status_code == 200
+    html_en = res_en.get_data(as_text=True)
+    assert '<html lang="en">' in html_en
+    assert "Haq Shufa Legal Guide" in html_en
+    assert "Right of Pre-emption" in html_en
+    assert "does not replace qualified legal advice" in html_en
+    assert "Advocate" in html_en
 
 
 def test_haq_shufa_navigation_presence(client):
-    """Verify that Haq Shufa Legal Guide appears in navbar and footer navigation in English."""
+    """Verify that Haq Shufa Legal Guide appears in navbar and footer navigation in both languages."""
     pages = ["/", "/dashboard", "/checklist", "/haq-shufa-guide"]
     for page in pages:
-        res = client.get(page)
+        # Default Bangla
+        res = client.get(f"{page}?lang=bn")
         assert res.status_code == 200
         html = res.get_data(as_text=True)
-        assert "Haq Shufa Legal Guide" in html, f"Nav link missing on {page}"
+        assert "হক শুফা" in html, f"Bangla nav link missing on {page}"
+
+        # English mode
+        res_en = client.get(f"{page}?lang=en")
+        assert res_en.status_code == 200
+        html_en = res_en.get_data(as_text=True)
+        assert "Haq Shufa" in html_en, f"English nav link missing on {page}"
+
+
 
 
 def test_haq_shufa_scenario_1_preload(client):
@@ -166,8 +179,8 @@ def test_haq_shufa_no_forbidden_government_claims(client):
         assert term not in content, f"Forbidden term '{term}' found on /haq-shufa-guide"
 
 
-def test_entire_site_has_no_bengali_characters(client):
-    """Verify that all user-facing website pages contain zero Bengali Unicode characters."""
+def test_entire_site_has_bengali_primary_language(client):
+    """Verify that all user-facing website pages set lang='bn' and have Bengali as primary language."""
     bengali_pattern = re.compile(r'[\u0980-\u09ff]')
     pages_to_check = [
         "/",
@@ -189,5 +202,40 @@ def test_entire_site_has_no_bengali_characters(client):
         res = client.get(page)
         assert res.status_code == 200
         html = res.get_data(as_text=True)
+        assert '<html lang="bn">' in html, f"Document language lang='bn' missing on {page}"
         matches = bengali_pattern.findall(html)
-        assert len(matches) == 0, f"Found {len(matches)} Bengali characters on {page}: {matches[:10]}"
+        assert len(matches) >= 50, f"Expected primary Bengali content on {page}, found only {len(matches)} characters"
+
+
+def test_bengali_headings_and_disclaimers(client):
+    """Verify key translated headings, navigation, and synthetic disclaimers appear in Bangla."""
+    # Home
+    res_home = client.get("/")
+    html_home = res_home.get_data(as_text=True)
+    assert "জমি কেনার আগেই যাচাই করুন" in html_home
+    assert "রেকর্ড যাচাই করুন" in html_home
+
+    # Dashboard
+    res_dash = client.get("/dashboard")
+    html_dash = res_dash.get_data(as_text=True)
+    assert "কাল্পনিক ভূমি রেকর্ড ড্যাশবোর্ড" in html_dash
+    assert "মোট ডেমো প্লট" in html_dash
+    assert "দ্বৈত-বিক্রয় বিরোধ" in html_dash
+
+    # Plot details & Warnings
+    res_plot4 = client.get("/plots/PLOT-1004")
+    html_plot4 = res_plot4.get_data(as_text=True)
+    assert "দ্বৈত-বিক্রয়ের সম্ভাব্য অসঙ্গতি" in html_plot4
+    assert "করণীয় যাচাইকরণ পদক্ষেপ" in html_plot4
+
+    # Checklist
+    res_chk = client.get("/checklist")
+    html_chk = res_chk.get_data(as_text=True)
+    assert "নাগরিক প্রাক-ক্রয় জমি যাচাইকরণ চেকলিস্ট" in html_chk
+    assert "মূল দলিল বালাম তল্লাশি" in html_chk
+
+    # Haq Shufa
+    res_shufa = client.get("/haq-shufa-guide")
+    html_shufa = res_shufa.get_data(as_text=True)
+    assert "হক শুফা আইনগত সহায়িকা" in html_shufa
+    assert "অগ্রক্রয়াধিকার" in html_shufa

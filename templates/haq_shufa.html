@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Haq Shufa Legal Guide (Right of Pre-emption) — {{ app_name }}{% endblock %}
+{% block title %}{{ t('haq_shufa_page_title') }} — {{ app_name }}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb mb-2 small text-muted">
-      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Haq Shufa Legal Guide</li>
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">{{ t('nav_home') }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ t('nav_haq_shufa') }}</li>
     </ol>
   </nav>
 
@@ -18,27 +18,32 @@
       <div class="col-lg-8">
         <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 text-teal-100 small mb-3 border border-white border-opacity-15">
           <i class="bi bi-book-half text-info"></i>
-          <span>Educational Legal Resource &bull; Bangladesh Land Law &amp; Pre-Emption Guide</span>
+          <span>
+            {% if current_lang == 'en' %}
+            Legal Awareness Guide &bull; Bangladesh Property Law &amp; Right of Pre-emption
+            {% else %}
+            আইনি সচেতনতামূলক নির্দেশিকা &bull; বাংলাদেশ ভূমি আইন ও অগ্রক্রয়াধিকার নির্দেশিকা
+            {% endif %}
+          </span>
         </div>
         <h1 class="fw-bold mb-2 display-6">
-          Haq Shufa Legal Guide
+          {{ t('haq_shufa_page_title') }}
         </h1>
         <h2 class="h5 text-info fw-normal mb-3">
-          Right of Pre-Emption &amp; Pre-Purchase Due Diligence Guide
+          {{ t('haq_shufa_page_subtitle') }}
         </h2>
         <p class="text-light text-opacity-90 lead fs-6 mb-0 pe-lg-4">
-          An explainable, fact-based educational guide on <strong>Haq Shufa</strong> (Right of Pre-emption) in Bangladesh. 
-          Learn how property classification, co-ownership structures, registered partition deeds, and statutory notice impact buyer vulnerability.
+          {{ t('haq_shufa_hero_p') }}
         </p>
       </div>
       <div class="col-lg-4">
         <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-15 small">
           <div class="d-flex align-items-center gap-2 mb-2 text-warning fw-semibold">
             <i class="bi bi-shield-exclamation fs-5"></i>
-            <span>Educational Scope Notice</span>
+            <span>{{ t('haq_shufa_notice_title') }}</span>
           </div>
           <p class="mb-0 text-white text-opacity-80">
-            This tool is educational and does not replace qualified legal advice. Pre-emption eligibility depends on complex factual chains, registry volume searches, and judicial precedents. Always consult an enrolled Advocate of the Bangladesh Bar Council.
+            {{ t('haq_shufa_notice_text') }}
           </p>
         </div>
       </div>
@@ -51,36 +56,67 @@
       <div class="card card-custom p-4 h-100 bg-white">
         <h4 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-info-circle text-teal"></i>
-          Understanding Haq Shufa / Right of Pre-Emption
+          {{ t('haq_shufa_what_title') }}
         </h4>
 
         <div class="mb-3">
-          <h6 class="fw-bold text-navy">What is Haq Shufa (Right of Pre-Emption)?</h6>
+          <h6 class="fw-bold text-navy">
+            {% if current_lang == 'en' %}
+            What is the Right of Pre-emption (Haq Shufa)?
+            {% else %}
+            হক শুফা (Right of Pre-emption) বলতে কী বোঝায়?
+            {% endif %}
+          </h6>
           <p class="text-secondary small mb-2">
-            <strong>Haq Shufa</strong> (Right of Pre-emption) is a preferential legal right under which an existing co-owner, co-sharer tenant, or in specific Islamic jurisprudence, an adjoining neighbor, possesses the legal priority to purchase an immovable property before or in substitution of an outside buyer (stranger), on identical financial terms.
+            {{ t('haq_shufa_what_desc') }}
           </p>
           <div class="p-3 bg-light rounded-2 border small text-dark mb-3">
-            <strong>Core Legal Principle:</strong> In Bangladesh property law, pre-emption is designed to protect joint holdings and shared homesteads from the involuntary intrusion of unfamiliar third parties, enabling legitimate co-owners to consolidate title through legal court proceedings.
+            {{ t('haq_shufa_core_principle') }}
           </div>
         </div>
 
         <div class="mb-3">
-          <h6 class="fw-bold text-navy">Why Applicability Depends on Property Type &amp; Specific Facts</h6>
+          <h6 class="fw-bold text-navy">
+            {% if current_lang == 'en' %}
+            Why Does Applicability Depend on Property Class &amp; Facts?
+            {% else %}
+            জমির শ্রেণি ও তথ্যের ওপর কেন এর প্রয়োগ নির্ভরশীল?
+            {% endif %}
+          </h6>
+          {% if current_lang == 'en' %}
           <p class="text-secondary small mb-2">
-            In Bangladesh, pre-emption cannot be determined by a single generic formula. Applicability depends strictly on:
+            In Bangladesh, pre-emption is not evaluated by a generic formula; it depends strictly on verifiable legal facts:
           </p>
           <ul class="small text-secondary mb-3 ps-3">
-            <li><strong>Property Classification:</strong> Agricultural holdings fall under Section 96 of the State Acquisition and Tenancy Act 1950, whereas non-agricultural tenancies are governed by Section 24 of the Non-Agricultural Tenancy Act 1949.</li>
-            <li><strong>Co-Ownership Origin:</strong> Following the landmark 2006 statutory amendment to Section 96 of the SAT Act, only <em>co-sharers by inheritance</em> can claim agricultural pre-emption. Co-sharers by purchase were statutorily excluded.</li>
-            <li><strong>Registered Partition:</strong> If co-sharers executed a registered partition deed with distinct demarcated boundaries and separate mutated khatians, the property ceases to be an undivided holding.</li>
-            <li><strong>Notice to Co-Sharers:</strong> Whether mandatory statutory transfer notices were formally issued through the Sub-Registry office directly impacts limitation deadlines.</li>
+            <li><strong>Property Classification:</strong> Agricultural land is governed by Section 96 of the State Acquisition and Tenancy (SAT) Act, 1950, whereas non-agricultural land is governed by Section 24 of the Non-Agricultural Tenancy (NAT) Act, 1949.</li>
+            <li><strong>Origin of Co-ownership:</strong> Following the landmark 2006 amendment to Section 96 of the SAT Act, pre-emption in agricultural land is strictly restricted to <em>co-sharers by inheritance</em>. Co-sharers by purchase were explicitly excluded.</li>
+            <li><strong>Registered Partition Deed:</strong> If co-sharers executed a registered partition deed (Aposh Bontonnama) accompanied by separated mutation khatians, undivided joint tenancy ceases to exist.</li>
+            <li><strong>Statutory Notice:</strong> Service of formal notice through the Sub-Registry office determines the strict limitation period for initiating pre-emption claims.</li>
           </ul>
+          {% else %}
+          <p class="text-secondary small mb-2">
+            বাংলাদেশে অগ্রক্রয়াধিকার কোনো ঢালাও ফর্মুলা দ্বারা নির্ধারিত হয় না; এটি নির্দিষ্ট কয়েকটি সুনির্দিষ্ট বাস্তব তথ্যের ওপর নির্ভর করে:
+          </p>
+          <ul class="small text-secondary mb-3 ps-3">
+            <li><strong>জমির শ্রেণিবিভাগ:</strong> কৃষিজমি নিয়ন্ত্রিত হয় স্টেট একুইজিশন অ্যান্ড প্রজাস্বত্ব আইন, ১৯৫০-এর ধারা ৯৬ (Section 96, SAT Act) দ্বারা; অন্যদিকে অকৃষি জমি অকৃষি প্রজাস্বত্ব আইন, ১৯৪৯-এর ধারা ২৪ (Section 24, NAT Act) দ্বারা নিয়ন্ত্রিত হয়।</li>
+            <li><strong>শরিকানার উৎস:</strong> ২০০৬ সালের ঐতিহাসিক সংশোধনীর মাধ্যমে কৃষিজমির ক্ষেত্রে (SAT Act Section 96) অগ্রক্রয়াধিকার শুধুমাত্র <em>ওয়ারিশসূত্রে সহ-শরিকদের (Co-sharers by inheritance)</em> জন্য সীমিত করা হয়েছে। খরিদসূত্রে শরিকদের বাদ দেওয়া হয়েছে।</li>
+            <li><strong>রেজিস্ট্রিকৃত আপস-বণ্টননামা:</strong> শরিকদের মাঝে যদি রেজিস্ট্রিকৃত আপস-বণ্টননামা দলিল থাকে এবং পৃথক খতিয়ান সৃজিত হয়ে থাকে, তবে জমিটি আর অবিভক্ত যৌথ সম্পত্তি থাকে না।</li>
+            <li><strong>শরিকদের আইনানুগ নোটিশ:</strong> সাব-রেজিস্ট্রি অফিসের মাধ্যমে সংবিধিবদ্ধ নোটিশ (Statutory Notice) জারি করা হয়েছে কি না, তা মামলার তামাদির সময়সীমা নির্ধারণে অত্যন্ত গুরুত্বপূর্ণ।</li>
+          </ul>
+          {% endif %}
         </div>
 
         <div class="p-3 bg-warning-subtle border border-warning rounded-3 small">
-          <strong class="text-dark d-block mb-1"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Critical Legal Caveat:</strong>
+          <strong class="text-dark d-block mb-1">
+            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+            {% if current_lang == 'en' %}Crucial Pre-Purchase Caution:{% else %}গুরুত্বপূর্ণ আইনি সতর্কতা:{% endif %}
+          </strong>
           <span class="text-secondary">
-            Never conclude that a land transaction is immune from pre-emption solely based on informal oral agreements or family understanding. Without formal registered partition deeds and updated mutation records, co-sharers retain civil litigation remedies in the court of competent jurisdiction.
+            {% if current_lang == 'en' %}
+            Do not rely solely on informal verbal family understandings. Without an executed registered partition deed and independent mutation khatians, co-sharers retain statutory standing to initiate civil pre-emption litigation.
+            {% else %}
+            শুধুমাত্র পারিবারিক মৌখিক সমঝোতার ওপর ভিত্তি করে জমি ক্রয়কে নিরাপদ মনে করবেন না। রেজিস্ট্রিকৃত বণ্টননামা ও পৃথক নামজারি খতিয়ান না থাকলে অন্য শরিকরা দেওয়ানি আদালতে অগ্রক্রয়াধিকারের মোকদ্দমা দায়েরের আইনি অধিকার রাখেন।
+            {% endif %}
           </span>
         </div>
       </div>
@@ -91,10 +127,14 @@
       <div class="card card-custom p-4 h-100 bg-white">
         <h4 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-bank text-primary"></i>
-          Bangladeshi Statutory Framework
+          {{ t('haq_shufa_statute_title') }}
         </h4>
         <p class="text-muted small mb-3">
-          Verified primary legal authorities governing pre-emption rights in Bangladesh. External links connect directly to the official <em>Laws of Bangladesh</em> repository (Ministry of Law, Justice and Parliamentary Affairs).
+          {% if current_lang == 'en' %}
+          Primary statutory provisions governing pre-emption in Bangladesh. Direct links to the Ministry of Law's <em>Laws of Bangladesh</em> portal are provided below.
+          {% else %}
+          বাংলাদেশে অগ্রক্রয়াধিকার সংক্রান্ত প্রধান আইনসমূহ। অফিসিয়াল আইনের মূলপাঠ দেখার জন্য আইন ও সংসদ বিষয়ক মন্ত্রণালয়ের <em>Laws of Bangladesh</em> পোর্টালের লিংক সংযুক্ত রয়েছে।
+          {% endif %}
         </p>
 
         <div class="d-flex flex-column gap-3">
@@ -103,18 +143,20 @@
             <div class="d-flex justify-content-between align-items-start mb-1">
               <span class="badge bg-primary">SAT Act, 1950</span>
               <a href="http://bdlaws.minlaw.gov.bd/act-241/section-8698.html" target="_blank" rel="noopener noreferrer" class="small text-decoration-none">
-                Official Law Text <i class="bi bi-box-arrow-up-right ms-1"></i>
+                {{ t('haq_shufa_official_law_text') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
               </a>
             </div>
-            <h6 class="fw-bold mb-1 text-navy">Section 96 &bull; Agricultural Land</h6>
+            <h6 class="fw-bold mb-1 text-navy">
+              {% if current_lang == 'en' %}Section 96 &bull; Agricultural Land (SAT Act){% else %}ধারা ৯৬ (Section 96) &bull; কৃষিজমি (SAT Act){% endif %}
+            </h6>
             <p class="small text-secondary mb-1">
-              <strong>Scope:</strong> Agricultural raiyati holdings.
+              <strong>{% if current_lang == 'en' %}Scope:{% else %}আওতা:{% endif %}</strong> {% if current_lang == 'en' %}Agricultural holdings and raiyati tenancies.{% else %}কৃষিজমি ও রায়তি জোত।{% endif %}
             </p>
             <p class="small text-secondary mb-1">
-              <strong>Key Rule:</strong> Restricted <em>exclusively to co-sharers by inheritance</em> under the State Acquisition and Tenancy (Amendment) Act, 2006.
+              <strong>{% if current_lang == 'en' %}Core Rule:{% else %}মূল নিয়ম:{% endif %}</strong> {% if current_lang == 'en' %}Restricted strictly to <em>co-sharers by inheritance</em> following the 2006 statutory amendment.{% else %}২০০৬ সালের সংশোধনীর পর শুধুমাত্র <em>ওয়ারিশসূত্রে সহ-শরিকদের (Co-sharers by inheritance)</em> মধ্যে সীমাবদ্ধ।{% endif %}
             </p>
             <span class="small text-muted d-block">
-              <strong>Limitation:</strong> Within 2 months of notice under Section 89, or within 2 months of the date of knowledge if notice was not served.
+              <strong>{% if current_lang == 'en' %}Limitation:{% else %}তামাদি সময়সীমা:{% endif %}</strong> {% if current_lang == 'en' %}Within 2 months of statutory notice under Section 89, or within 2 months of knowledge if unserved.{% else %}ধারা ৮৯ অনুযায়ী নোটিশ জারির ২ মাসের মধ্যে, অথবা নোটিশ না পেলে হস্তান্তরের তথ্য জানার ২ মাসের মধ্যে।{% endif %}
             </span>
           </div>
 
@@ -123,18 +165,20 @@
             <div class="d-flex justify-content-between align-items-start mb-1">
               <span class="badge bg-info text-dark">NAT Act, 1949</span>
               <a href="http://bdlaws.minlaw.gov.bd/act-231/section-8479.html" target="_blank" rel="noopener noreferrer" class="small text-decoration-none">
-                Official Law Text <i class="bi bi-box-arrow-up-right ms-1"></i>
+                {{ t('haq_shufa_official_law_text') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
               </a>
             </div>
-            <h6 class="fw-bold mb-1 text-navy">Section 24 &bull; Non-Agricultural Land</h6>
+            <h6 class="fw-bold mb-1 text-navy">
+              {% if current_lang == 'en' %}Section 24 &bull; Non-Agricultural Land (NAT Act){% else %}ধারা ২৪ (Section 24) &bull; অকৃষি জমি (NAT Act){% endif %}
+            </h6>
             <p class="small text-secondary mb-1">
-              <strong>Scope:</strong> Non-agricultural homestead, residential, and commercial tenancies.
+              <strong>{% if current_lang == 'en' %}Scope:{% else %}আওতা:{% endif %}</strong> {% if current_lang == 'en' %}Residential, commercial, or homestead non-agricultural tenancies.{% else %}বসতবাড়ি, বাণিজ্যিক বা আবাসিক অকৃষি প্রজাস্বত্ব।{% endif %}
             </p>
             <p class="small text-secondary mb-1">
-              <strong>Key Rule:</strong> Exercisable by any co-sharer tenant, whether by inheritance or purchase, when a share of the tenancy is transferred.
+              <strong>{% if current_lang == 'en' %}Core Rule:{% else %}মূল নিয়ম:{% endif %}</strong> {% if current_lang == 'en' %}Available to co-sharer tenants by both inheritance and deed of purchase.{% else %}ওয়ারিশ বা খরিদ উভয় সূত্রের যেকোনো সহ-শরিক প্রজাই এই দাবি করতে পারেন।{% endif %}
             </p>
             <span class="small text-muted d-block">
-              <strong>Limitation:</strong> Within 4 months of notice under Section 23, or within applicable general limitation from date of knowledge.
+              <strong>{% if current_lang == 'en' %}Limitation:{% else %}তামাদি সময়সীমা:{% endif %}</strong> {% if current_lang == 'en' %}Within 4 months of service of notice under Section 23, or within applicable limitation from date of knowledge.{% else %}ধারা ২৩ অনুসারে নোটিশ জারির ৪ মাসের মধ্যে, অথবা অবগতির তারিখ হতে সাধারণ তামাদি মেয়াদের মধ্যে।{% endif %}
             </span>
           </div>
 
@@ -142,14 +186,24 @@
           <div class="p-3 rounded-3 border bg-light">
             <div class="d-flex justify-content-between align-items-start mb-1">
               <span class="badge bg-secondary">Muslim Personal Law</span>
-              <span class="small text-muted">Muhammadan Law</span>
+              <span class="small text-muted">{% if current_lang == 'en' %}Muhammadan Law{% else %}মোহামেডান ল (Muhammadan Law){% endif %}</span>
             </div>
-            <h6 class="fw-bold mb-1 text-navy">Haq Shufa &bull; Personal Law Doctrine</h6>
+            <h6 class="fw-bold mb-1 text-navy">
+              {% if current_lang == 'en' %}Haq Shufa &bull; Muslim Personal Law Pre-emption{% else %}হক শুফা &bull; মুসলিম ব্যক্তিগত আইন বিধান{% endif %}
+            </h6>
             <p class="small text-secondary mb-1">
-              Recognizes three classes: (1) <em>Shafi-i-Sharik</em> (co-owner), (2) <em>Shafi-i-Khalit</em> (participator in easements/rights of way), and (3) <em>Shafi-i-Jar</em> (adjacent neighbor).
+              {% if current_lang == 'en' %}
+              Three classes of claimants: (1) <em>Shafi-i-Sharik</em> (co-sharers), (2) <em>Shafi-i-Khalit</em> (participators in immunities/easements), and (3) <em>Shafi-i-Jar</em> (adjacent owners).
+              {% else %}
+              তিন শ্রেণির দাবিদার: (১) <em>শাফি-ই-শারিক</em> (সহ-শরিক), (২) <em>শাফি-ই-খালিত</em> (সুবিধাভোগী/চলাচলের পথের শরিক), এবং (৩) <em>শাফি-ই-জার</em> (সংলগ্ন প্রতিবেশী)।
+              {% endif %}
             </p>
             <span class="small text-muted d-block">
-              Requires strict formal compliance with three demands: <em>Talab-i-Mowasibat</em>, <em>Talab-i-Ishhad</em>, and <em>Talab-i-Tamlik</em>.
+              {% if current_lang == 'en' %}
+              Requires strict performance of demands: <em>Talab-i-Mowasibat</em>, <em>Talab-i-Ishhad</em>, and <em>Talab-i-Tamlik</em>.
+              {% else %}
+              তিনটি আনুষ্ঠানিক তলব বা দাবির যথাযথ পালন আবশ্যক: <em>তলব-ই-মোয়াছিবাত</em>, <em>তলব-ই-ইশহাদ</em> ও <em>তলব-ই-তমলিক</em>।
+              {% endif %}
             </span>
           </div>
         </div>
@@ -162,29 +216,29 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom gap-3">
       <div>
         <div class="d-flex align-items-center gap-2 mb-1">
-          <span class="badge bg-dark">Educational Assessment Tool</span>
-          <span class="badge bg-light text-dark border">Synthetic Demonstrations Only</span>
+          <span class="badge bg-dark">{% if current_lang == 'en' %}Legal Evaluation Tool{% else %}আইনি মূল্যায়ন টুল{% endif %}</span>
+          <span class="badge bg-light text-dark border">{% if current_lang == 'en' %}Educational Model{% else %}ডেমোনস্ট্রেশন মডেল{% endif %}</span>
         </div>
         <h3 class="fw-bold mb-1 text-navy" style="color: var(--brand-navy-900);">
-          Haq Shufa Pre-Purchase Risk Indicator Assessment
+          {{ t('haq_shufa_tool_title') }}
         </h3>
         <p class="text-muted small mb-0">
-          Answer factual due diligence questions to evaluate pre-emption indicators under Bangladesh land law. Results are categorized into three strictly informational groups.
+          {{ t('haq_shufa_tool_desc') }}
         </p>
       </div>
 
       <!-- Quick Demo Scenario Loaders -->
       <div class="text-md-end">
-        <span class="small d-block text-muted mb-1">Load Synthetic Test Scenarios:</span>
+        <span class="small d-block text-muted mb-1">{{ t('haq_shufa_load_demo') }}</span>
         <div class="btn-group btn-group-sm">
           <a href="{{ url_for('haq_shufa_guide', scenario='DEMO-SHUFA-01') }}" class="btn btn-outline-danger">
-            Scenario 1 (Inheritance)
+            {{ t('haq_shufa_scenario_1_btn') }}
           </a>
           <a href="{{ url_for('haq_shufa_guide', scenario='DEMO-SHUFA-02') }}" class="btn btn-outline-warning">
-            Scenario 2 (Unverified Facts)
+            {{ t('haq_shufa_scenario_2_btn') }}
           </a>
           <a href="{{ url_for('haq_shufa_guide', scenario='DEMO-SHUFA-03') }}" class="btn btn-outline-success">
-            Scenario 3 (Partitioned Sole Holding)
+            {{ t('haq_shufa_scenario_3_btn') }}
           </a>
         </div>
       </div>
@@ -193,26 +247,31 @@
     <!-- Assessment Form -->
     <form method="POST" action="{{ url_for('haq_shufa_guide') }}" id="haq-shufa-form">
       <div class="row g-4">
-        
+
         <!-- Question 1: Property Type -->
         <div class="col-md-6">
           <div class="p-3 rounded-3 border h-100 bg-light-subtle">
             <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
-              <span class="badge bg-primary">1</span> Property Classification
+              <span class="badge bg-primary">{% if current_lang == 'en' %}1{% else %}১{% endif %}</span>
+              {% if current_lang == 'en' %}Property Classification{% else %}জমির শ্রেণিবিভাগ (Property Classification){% endif %}
             </label>
             <p class="small text-muted mb-2">
+              {% if current_lang == 'en' %}
               Determines whether Section 96 of the SAT Act (agricultural) or Section 24 of the NAT Act (non-agricultural) governs.
+              {% else %}
+              এটি নির্ধারণ করে জমিটি SAT Act-এর ধারা ৯৬ (কৃষি) নাকি NAT Act-এর ধারা ২৪ (অকৃষি) দ্বারা পরিচালিত হবে।
+              {% endif %}
             </p>
             <select name="property_type" class="form-select form-select-sm" required id="field_property_type">
-              <option value="">Select Property Classification...</option>
+              <option value="">{% if current_lang == 'en' %}Select Property Type...{% else %}জমির শ্রেণি নির্বাচন করুন...{% endif %}</option>
               <option value="agricultural" {% if form_data.get('property_type') == 'agricultural' %}selected{% endif %}>
-                Agricultural Land (Cultivated / Farming / Orchard)
+                {% if current_lang == 'en' %}Agricultural Land (Cropland / Orchard / Farm){% else %}কৃষিজমি (চাষাবাদ / ফসল / বাগান){% endif %}
               </option>
               <option value="non_agricultural" {% if form_data.get('property_type') == 'non_agricultural' %}selected{% endif %}>
-                Non-Agricultural Land (Homestead / Residential / Commercial Plot)
+                {% if current_lang == 'en' %}Non-Agricultural Land (Homestead / Commercial / Urban Plot){% else %}অকৃষি জমি (ভিটা / বসতবাড়ি / বাণিজ্যিক প্লট){% endif %}
               </option>
               <option value="unsure" {% if form_data.get('property_type') == 'unsure' %}selected{% endif %}>
-                Unsure / Mixed Record Classification (Not Formally Verified)
+                {% if current_lang == 'en' %}Unsure / Mixed Classification (Not verified){% else %}অনিশ্চিত / মিশ্র শ্রেণি (দাপ্তরিকভাবে যাচাই করা হয়নি){% endif %}
               </option>
             </select>
           </div>
@@ -222,24 +281,29 @@
         <div class="col-md-6">
           <div class="p-3 rounded-3 border h-100 bg-light-subtle">
             <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
-              <span class="badge bg-primary">2</span> Co-Ownership Title Origin
+              <span class="badge bg-primary">{% if current_lang == 'en' %}2{% else %}২{% endif %}</span>
+              {% if current_lang == 'en' %}Co-Ownership Origin{% else %}শরিকানা স্বত্বের উৎস (Co-Ownership Origin){% endif %}
             </label>
             <p class="small text-muted mb-2">
-              Identifies whether co-sharers acquired title by inheritance or through registered deed of purchase.
+              {% if current_lang == 'en' %}
+              Indicates whether co-sharers acquired interest through inheritance or through registered deed of purchase.
+              {% else %}
+              শরিকরা ওয়ারিশসূত্রে স্বত্ব পেয়েছেন নাকি রেজিস্ট্রিকৃত ক্রয় দলিলের মাধ্যমে পেয়েছেন তা নির্দেশ করে।
+              {% endif %}
             </p>
             <select name="co_ownership" class="form-select form-select-sm" required id="field_co_ownership">
-              <option value="">Select Co-Ownership Origin...</option>
+              <option value="">{% if current_lang == 'en' %}Select Origin...{% else %}শরিকানার উৎস নির্বাচন করুন...{% endif %}</option>
               <option value="inheritance_undivided" {% if form_data.get('co_ownership') == 'inheritance_undivided' %}selected{% endif %}>
-                Undivided Joint Heirs (Inherited Co-Ownership)
+                {% if current_lang == 'en' %}Undivided Inherited Property (Co-sharers by inheritance){% else %}অবিভক্ত ওয়ারিশি সম্পত্তি (উত্তরাধিকার সূত্রে প্রাপ্ত যৌথ মালিকানা){% endif %}
               </option>
               <option value="purchase_undivided" {% if form_data.get('co_ownership') == 'purchase_undivided' %}selected{% endif %}>
-                Undivided Co-Sharers by Purchase
+                {% if current_lang == 'en' %}Co-sharer by Deed of Purchase (Khord-sharik){% else %}খরিদসূত্রে অবিভক্ত সহ-শরিক{% endif %}
               </option>
               <option value="sole_ownership" {% if form_data.get('co_ownership') == 'sole_ownership' %}selected{% endif %}>
-                Sole Owner / No Known Co-Sharers (Independent Single Holding)
+                {% if current_lang == 'en' %}Sole Ownership / No Co-sharers (Segregated holding){% else %}একক মালিকানা / কোনো পরিচিত সহ-শরিক নেই (স্বাধীন পৃথক জোত){% endif %}
               </option>
               <option value="unsure" {% if form_data.get('co_ownership') == 'unsure' %}selected{% endif %}>
-                Unsure / Co-Sharer Genealogy Not Researched
+                {% if current_lang == 'en' %}Unsure / Genealogy &amp; title chain unverified{% else %}অনিশ্চিত / ওয়ারিশনামা বা শরিকি ইতিহাস যাচাই করা হয়নি{% endif %}
               </option>
             </select>
           </div>
@@ -249,24 +313,29 @@
         <div class="col-md-6">
           <div class="p-3 rounded-3 border h-100 bg-light-subtle">
             <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
-              <span class="badge bg-primary">3</span> Partition &amp; Demarcation
+              <span class="badge bg-primary">{% if current_lang == 'en' %}3{% else %}৩{% endif %}</span>
+              {% if current_lang == 'en' %}Partition &amp; Demarcation{% else %}সীমানা ও বণ্টননামা (Partition &amp; Demarcation){% endif %}
             </label>
             <p class="small text-muted mb-2">
-              Verifies if formal registered partition deed exists or if property is held under informal oral possession.
+              {% if current_lang == 'en' %}
+              Whether a registered partition deed exists or whether possession is governed merely by verbal understanding.
+              {% else %}
+              রেজিস্ট্রিকৃত আপস-বণ্টননামা দলিল রয়েছে কি না নাকি শুধু মৌখিক সমঝোতায় ভোগদখল চলছে।
+              {% endif %}
             </p>
             <select name="partition_status" class="form-select form-select-sm" required id="field_partition_status">
-              <option value="">Select Partition Status...</option>
+              <option value="">{% if current_lang == 'en' %}Select Partition Status...{% else %}বণ্টনের অবস্থা নির্বাচন করুন...{% endif %}</option>
               <option value="formal_registered_partition" {% if form_data.get('partition_status') == 'formal_registered_partition' %}selected{% endif %}>
-                Formal Registered Partition Deed &amp; Mutated Khatian Exist
+                {% if current_lang == 'en' %}Registered Partition Deed &amp; Separate Mutation Khatians Exist{% else %}রেজিস্ট্রিকৃত বণ্টননামা দলিল ও পৃথক নামজারি খতিয়ান বিদ্যমান{% endif %}
               </option>
               <option value="amicable_no_deed" {% if form_data.get('partition_status') == 'amicable_no_deed' %}selected{% endif %}>
-                Amicable Possession but NO Registered Partition Deed
+                {% if current_lang == 'en' %}Informal Verbal Division Only (No registered partition deed){% else %}মৌখিক সমঝোতায় পৃথক দখল, কিন্তু কোনো রেজিস্ট্রিকৃত দলিল নেই{% endif %}
               </option>
               <option value="unpartitioned_no_deed" {% if form_data.get('partition_status') == 'unpartitioned_no_deed' %}selected{% endif %}>
-                Completely Unpartitioned Joint Holding
+                {% if current_lang == 'en' %}Completely Undivided Joint Property (Ejmali){% else %}সম্পূর্ণ অবিভক্ত এজমালি বা যৌথ সম্পত্তি{% endif %}
               </option>
               <option value="unknown_partition" {% if form_data.get('partition_status') == 'unknown_partition' %}selected{% endif %}>
-                Unsure / Partition Records Not Examined
+                {% if current_lang == 'en' %}Unsure / Partition record not examined{% else %}অনিশ্চিত / বণ্টনের রেকর্ড পরীক্ষা করা হয়নি{% endif %}
               </option>
             </select>
           </div>
@@ -276,24 +345,29 @@
         <div class="col-md-6">
           <div class="p-3 rounded-3 border h-100 bg-light-subtle">
             <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
-              <span class="badge bg-primary">4</span> Transfer Scope &amp; Purchaser Status
+              <span class="badge bg-primary">{% if current_lang == 'en' %}4{% else %}৪{% endif %}</span>
+              {% if current_lang == 'en' %}Transfer Scope &amp; Purchaser Status{% else %}বিক্রয়ের আওতা ও ক্রেতার অবস্থান (Transfer Scope){% endif %}
             </label>
             <p class="small text-muted mb-2">
-              Indicates whether the buyer is an outside stranger purchasing an undivided share in a joint tenancy.
+              {% if current_lang == 'en' %}
+              Whether the prospective purchaser is an outside third-party stranger purchasing an undivided share.
+              {% else %}
+              ক্রেতা কি পরিবারের বাইরের কোনো তৃতীয় পক্ষ (Stranger) হিসেবে অবিভক্ত হিস্যা ক্রয় করছেন?
+              {% endif %}
             </p>
             <select name="transfer_scope" class="form-select form-select-sm" required id="field_transfer_scope">
-              <option value="">Select Transfer Scope...</option>
+              <option value="">{% if current_lang == 'en' %}Select Transfer Scope...{% else %}বিক্রয়ের পরিধি নির্বাচন করুন...{% endif %}</option>
               <option value="undivided_share_stranger" {% if form_data.get('transfer_scope') == 'undivided_share_stranger' %}selected{% endif %}>
-                Selling Undivided Share to an Outside Stranger / Third Party
+                {% if current_lang == 'en' %}Sale of Undivided Share to Third-Party Stranger{% else %}বাইরের তৃতীয় পক্ষ (Stranger) ক্রেতার নিকট অবিভক্ত হিস্যা বিক্রয়{% endif %}
               </option>
               <option value="to_existing_cosharer" {% if form_data.get('transfer_scope') == 'to_existing_cosharer' %}selected{% endif %}>
-                Selling Share to an Existing Co-Sharer
+                {% if current_lang == 'en' %}Conveyance to an Existing Co-Sharer{% else %}বিদ্যমান সহ-শরিকের নিকট হিস্যা বিক্রয়{% endif %}
               </option>
               <option value="entire_demarcated_holding" {% if form_data.get('transfer_scope') == 'entire_demarcated_holding' %}selected{% endif %}>
-                Selling Entire Independent Demarcated Holding
+                {% if current_lang == 'en' %}Sale of an Entire Demarcated Independent Holding{% else %}সম্পূর্ণ স্বাধীন ও নির্দিষ্ট সীমানাযুক্ত জোত বিক্রয়{% endif %}
               </option>
               <option value="unsure" {% if form_data.get('transfer_scope') == 'unsure' %}selected{% endif %}>
-                Unsure / Share Boundaries Not Formally Surveyed
+                {% if current_lang == 'en' %}Unsure / Boundaries not officially surveyed{% else %}অনিশ্চিত / হিস্যার সীমানা আনুষ্ঠানিকভাবে জরিপ করা হয়নি{% endif %}
               </option>
             </select>
           </div>
@@ -303,27 +377,32 @@
         <div class="col-md-6">
           <div class="p-3 rounded-3 border h-100 bg-light-subtle">
             <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
-              <span class="badge bg-primary">5</span> Statutory Notice to Co-Sharers
+              <span class="badge bg-primary">{% if current_lang == 'en' %}5{% else %}৫{% endif %}</span>
+              {% if current_lang == 'en' %}Statutory Notice to Co-Sharers{% else %}সহ-শরিকদের সংবিধিবদ্ধ নোটিশ (Statutory Notice){% endif %}
             </label>
             <p class="small text-muted mb-2">
-              Verifies whether formal statutory notice under Section 89 of the SAT Act or Section 23 of the NAT Act was served.
+              {% if current_lang == 'en' %}
+              Whether formal notice under Section 89 SAT Act or Section 23 NAT Act has been served.
+              {% else %}
+              SAT Act ধারা ৮৯ বা NAT Act ধারা ২৩ অনুযায়ী শরিকদের নিকট আনুষ্ঠানিক নোটিশ পাঠানো হয়েছে কি না।
+              {% endif %}
             </p>
             <select name="notice_status" class="form-select form-select-sm" required id="field_notice_status">
-              <option value="">Select Statutory Notice Status...</option>
+              <option value="">{% if current_lang == 'en' %}Select Notice Status...{% else %}নোটিশের অবস্থা নির্বাচন করুন...{% endif %}</option>
               <option value="written_notice_served" {% if form_data.get('notice_status') == 'written_notice_served' %}selected{% endif %}>
-                Written Statutory Notice Served / Written Co-Sharer Waiver
+                {% if current_lang == 'en' %}Formal Statutory Notice Served / Written No-Objection Secured{% else %}লিখিত সংবিধিবদ্ধ নোটিশ জারি করা হয়েছে / শরিকদের লিখিত সম্মতিপত্র রয়েছে{% endif %}
               </option>
               <option value="no_notice_served" {% if form_data.get('notice_status') == 'no_notice_served' %}selected{% endif %}>
-                No Formal Notice Served to Co-Sharers
+                {% if current_lang == 'en' %}No Formal Notice Served to Co-Sharers{% else %}সহ-শরিকদের কোনো আনুষ্ঠানিক নোটিশ পাঠানো হয়নি{% endif %}
               </option>
               <option value="disputed_notice" {% if form_data.get('notice_status') == 'disputed_notice' %}selected{% endif %}>
-                Active Dispute / Co-Sharer Objections Raised
+                {% if current_lang == 'en' %}Active Dispute / Written Objections Lodged{% else %}সক্রিয় বিরোধ / সহ-শরিকদের লিখিত আপত্তি বিদ্যমান{% endif %}
               </option>
               <option value="unknown_notice" {% if form_data.get('notice_status') == 'unknown_notice' %}selected{% endif %}>
-                Unknown / Sub-Registry Notice Not Checked
+                {% if current_lang == 'en' %}Unsure / Registry notice records unverified{% else %}অনিশ্চিত / সাব-রেজিস্ট্রির নোটিশ বালাম পরীক্ষা করা হয়নি{% endif %}
               </option>
               <option value="not_applicable_sole" {% if form_data.get('notice_status') == 'not_applicable_sole' %}selected{% endif %}>
-                Not Applicable (Independent Sole Ownership)
+                {% if current_lang == 'en' %}Not Applicable (Sole ownership){% else %}প্রযোজ্য নয় (একক ও স্বাধীন স্বত্ব){% endif %}
               </option>
             </select>
           </div>
@@ -333,24 +412,29 @@
         <div class="col-md-6">
           <div class="p-3 rounded-3 border h-100 bg-light-subtle">
             <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
-              <span class="badge bg-primary">6</span> Shared Easements &amp; Adjoining Land
+              <span class="badge bg-primary">{% if current_lang == 'en' %}6{% else %}৬{% endif %}</span>
+              {% if current_lang == 'en' %}Easements &amp; Contiguous Boundaries{% else %}সাধারণ পথ ও সীমানা সংলগ্নতা (Easements &amp; Adjoining){% endif %}
             </label>
             <p class="small text-muted mb-2">
-              Checks for shared common pathways, common water drainage, or adjoining boundary claims under Muslim law.
+              {% if current_lang == 'en' %}
+              Shared access passages, drainage easements, or contiguous boundaries invoking vicinage claims.
+              {% else %}
+              যৌথ চলাচলের রাস্তা, নর্দমা বা মুসলিম আইনের অধীনে সংলগ্ন প্রতিবেশীর কোনো দাবি রয়েছে কি না।
+              {% endif %}
             </p>
             <select name="easement_status" class="form-select form-select-sm" required id="field_easement_status">
-              <option value="">Select Easement &amp; Adjoining Condition...</option>
+              <option value="">{% if current_lang == 'en' %}Select Easement Status...{% else %}চলাচলের পথ ও সীমানার অবস্থা নির্বাচন করুন...{% endif %}</option>
               <option value="independent" {% if form_data.get('easement_status') == 'independent' %}selected{% endif %}>
-                Independent Access &amp; Clear Separate Boundary
+                {% if current_lang == 'en' %}Fully Independent Access Road &amp; Demarcated Boundaries{% else %}সম্পূর্ণ স্বাধীন প্রবেশপথ ও সুস্পষ্ট পৃথক সীমানা{% endif %}
               </option>
               <option value="shared_easement" {% if form_data.get('easement_status') == 'shared_easement' %}selected{% endif %}>
-                Shared Common Road or Water Drain with Neighbors
+                {% if current_lang == 'en' %}Shared Right of Way / Common Drainage Easements{% else %}প্রতিবেশীদের সাথে যৌথ চলাচলের রাস্তা বা পানি নিষ্কাশনের ড্রেন{% endif %}
               </option>
               <option value="contiguous_vicinage" {% if form_data.get('easement_status') == 'contiguous_vicinage' %}selected{% endif %}>
-                Contiguous Neighboring Plot with Undivided Access
+                {% if current_lang == 'en' %}Contiguous Boundary / Direct Vicinage{% else %}সংলগ্ন সীমানা ও অবিভক্ত প্রবেশাধিকার{% endif %}
               </option>
               <option value="unsure" {% if form_data.get('easement_status') == 'unsure' %}selected{% endif %}>
-                Unsure / Field Survey Not Conducted
+                {% if current_lang == 'en' %}Unsure / Physical survey not conducted{% else %}অনিশ্চিত / সরেজমিনে ফিজিক্যাল সার্ভে করা হয়নি{% endif %}
               </option>
             </select>
           </div>
@@ -359,14 +443,19 @@
 
       <div class="mt-4 pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div class="text-muted small">
-          <i class="bi bi-shield-check text-teal me-1"></i> No private data requested. Never enter real national identification numbers or confidential records.
+          <i class="bi bi-shield-check text-teal me-1"></i>
+          {% if current_lang == 'en' %}
+          No personal identification is collected. Do not enter National ID or sensitive financial details.
+          {% else %}
+          কোনো সংবেদনশীল ব্যক্তিগত তথ্য চাওয়া হয় না। ভুলেও জাতীয় পরিচয়পত্র নম্বর বা গোপনীয় তথ্য ইনপুট করবেন না।
+          {% endif %}
         </div>
         <div class="d-flex gap-2">
           <button type="reset" class="btn btn-outline-secondary btn-sm" id="haq-shufa-reset-btn">
-            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Questions
+            <i class="bi bi-arrow-counterclockwise me-1"></i> {{ t('haq_shufa_reset_btn') }}
           </button>
           <button type="submit" class="btn btn-teal">
-            <i class="bi bi-shield-shaded me-1"></i> Evaluate Pre-Purchase Risk Indicators
+            <i class="bi bi-shield-shaded me-1"></i> {{ t('haq_shufa_eval_btn') }}
           </button>
         </div>
       </div>
@@ -376,24 +465,37 @@
   <!-- Evaluation Results Section -->
   {% if assessment %}
   <div class="card card-custom p-4 p-md-5 mb-4 bg-white shadow-sm border-{{ assessment.badge_color }}" id="haq-shufa-results-card">
-    
+
     <!-- Top Result Banner -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-4 pb-3 border-bottom gap-3">
       <div>
-        <span class="text-muted small d-block mb-1">Informational Pre-Purchase Classification:</span>
+        <span class="text-muted small d-block mb-1">
+          {% if current_lang == 'en' %}Pre-Purchase Evaluation Classification:{% else %}ক্রয়পূর্ব মূল্যায়ন ফলাফল শ্রেণিবিভাগ:{% endif %}
+        </span>
         <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
           <h3 class="fw-bold mb-0 text-{{ assessment.badge_color }}">
+            {% if current_lang == 'en' %}
             {{ assessment.category }}
+            {% else %}
+            {{ assessment.category_bn or assessment.category }}
+            {% endif %}
           </h3>
+          <span class="badge bg-light text-secondary border small">
+            {{ assessment.category }}
+          </span>
         </div>
         <p class="text-secondary mb-0">
+          {% if current_lang == 'en' %}
           {{ assessment.summary }}
+          {% else %}
+          {{ assessment.summary_bn or assessment.summary }}
+          {% endif %}
         </p>
       </div>
 
       <div class="text-md-end flex-shrink-0">
         <button class="btn btn-outline-secondary btn-sm" data-action="print-report">
-          <i class="bi bi-printer me-1"></i> Print Assessment
+          <i class="bi bi-printer me-1"></i> {{ t('haq_shufa_print_btn') }}
         </button>
       </div>
     </div>
@@ -402,10 +504,16 @@
     <div class="alert alert-warning border border-warning-subtle d-flex align-items-start gap-3 mb-4" role="alert">
       <i class="bi bi-shield-exclamation fs-3 text-warning flex-shrink-0 mt-1"></i>
       <div class="small">
-        <strong class="d-block mb-1">Mandatory Educational Disclaimer:</strong>
+        <strong class="d-block mb-1">
+          {% if current_lang == 'en' %}Mandatory Educational Disclaimer:{% else %}আবশ্যিক শিক্ষামূলক সতর্কতা:{% endif %}
+        </strong>
         <span>
           {{ assessment.educational_disclaimer }}
-          A web-based verification questionnaire cannot independently inspect physical Volume (Balam) registers at the Sub-Registry office, uncover pending civil title suits, or validate family genealogy. This assessment groups provided indicators for informational guidance only.
+          {% if current_lang == 'en' %}
+          An automated questionnaire cannot manually inspect Sub-Registry Volume (Balam) books, verify active civil court injunctions, or independently audit heirship genealogies (does not replace qualified legal advice). This evaluation serves solely as structured informational due diligence based on user inputs.
+          {% else %}
+          একটি স্বয়ংক্রিয় ওয়েব মূল্যায়ন প্রশ্নমালা কখনো সাব-রেজিস্ট্রি অফিসের ভলিউম বালাম বই পরিদর্শন, আদালতে চলমান দেওয়ানি স্বত্ব মোকদ্দমা অথবা পারিবারিক ওয়ারিশনামার সত্যতা ফিজিক্যালি যাচাই করতে পারে না (does not replace qualified legal advice)। এই মূল্যায়নটি কেবল ব্যবহারকারীর প্রদত্ত তথ্যের ভিত্তিতে আইনি নির্দেশিকা প্রদান করে।
+          {% endif %}
         </span>
       </div>
     </div>
@@ -415,7 +523,7 @@
       <div class="col-lg-6">
         <h5 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-clipboard2-check text-teal"></i>
-          Observed Factual Indicators
+          {{ t('haq_shufa_findings_title') }}
         </h5>
         <div class="d-flex flex-column gap-2">
           {% for finding in assessment.findings %}
@@ -430,10 +538,21 @@
               {% else %}
                 <i class="bi bi-info-circle-fill text-primary"></i>
               {% endif %}
-              <strong class="text-navy small">{{ finding.factor }}</strong>
+              <strong class="text-navy small">
+                {% if current_lang == 'en' %}
+                {{ finding.factor }}
+                {% else %}
+                {{ finding.factor_bn or finding.factor }}
+                {% endif %}
+              </strong>
+              <span class="badge bg-light text-muted border text-uppercase" style="font-size: 0.65rem;">{{ finding.factor }}</span>
             </div>
             <p class="small text-secondary mb-0 ps-4">
+              {% if current_lang == 'en' %}
               {{ finding.detail }}
+              {% else %}
+              {{ finding.detail_bn or finding.detail }}
+              {% endif %}
             </p>
           </div>
           {% endfor %}
@@ -444,7 +563,7 @@
       <div class="col-lg-6">
         <h5 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-journal-text text-primary"></i>
-          Relevant Legal Provisions &amp; Citations
+          {{ t('haq_shufa_provisions_title') }}
         </h5>
 
         <div class="d-flex flex-column gap-3 mb-4">
@@ -464,7 +583,7 @@
               {{ statute.applicability }}
             </p>
             <span class="small text-muted d-block">
-              <strong>Limitation Period:</strong> {{ statute.limitation }}
+              <strong>{% if current_lang == 'en' %}Limitation Window:{% else %}তামাদি বা সময়সীমা:{% endif %}</strong> {{ statute.limitation }}
             </span>
           </div>
           {% endfor %}
@@ -472,7 +591,7 @@
 
         <h5 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-list-check text-teal"></i>
-          Citizen Due Diligence Steps Before Signing Deed
+          {{ t('haq_shufa_steps_title') }}
         </h5>
         <div class="p-3 rounded-3 border bg-white">
           <ul class="small text-secondary mb-0 ps-3 d-flex flex-column gap-2">
@@ -491,10 +610,10 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
         <h4 class="fw-bold text-navy mb-1" style="color: var(--brand-navy-900);">
-          Pre-Purchase Due Diligence Roadmap
+          {{ t('haq_shufa_roadmap_title') }}
         </h4>
         <p class="text-muted small mb-0">
-          Standard investigative steps required in Bangladesh to minimize post-purchase pre-emption litigation.
+          {{ t('haq_shufa_roadmap_desc') }}
         </p>
       </div>
     </div>
@@ -503,58 +622,24 @@
       <table class="table table-custom table-hover">
         <thead>
           <tr>
-            <th>Stage &amp; Document</th>
-            <th>Primary Authority</th>
-            <th>Verification Objectives</th>
-            <th>Pre-Emption Significance</th>
+            <th>{% if current_lang == 'en' %}Stage &amp; Document{% else %}ধাপ ও নথিপত্র{% endif %}</th>
+            <th>{% if current_lang == 'en' %}Competent Authority{% else %}মূল কর্তৃপক্ষ{% endif %}</th>
+            <th>{% if current_lang == 'en' %}Investigation Objective{% else %}যাচাইকরণের উদ্দেশ্য{% endif %}</th>
+            <th>{% if current_lang == 'en' %}Pre-emption Risk Significance{% else %}হক শুফা ঝুঁকি সংশ্লিষ্টতা{% endif %}</th>
           </tr>
         </thead>
         <tbody>
+          {% for r in roadmap_items %}
           <tr>
             <td class="fw-semibold">
               <i class="bi bi-file-earmark-text text-teal me-1"></i>
-              Bia Deeds &amp; Registry Volume Search
+              {{ r.stage }}
             </td>
-            <td>Sub-Registry Office</td>
-            <td class="small">Inspect Volume Books for minimum 12-25 years chain of title and encumbrance search.</td>
-            <td class="small text-danger fw-semibold">Discloses recorded transfers, previous co-sharers, and registered partition deeds.</td>
+            <td>{{ r.authority }}</td>
+            <td class="small">{{ r.objectives }}</td>
+            <td class="small {{ r.significance_class }}">{{ r.significance }}</td>
           </tr>
-          <tr>
-            <td class="fw-semibold">
-              <i class="bi bi-people text-info me-1"></i>
-              Heirship Certificate
-            </td>
-            <td>Union Parishad / City Ward</td>
-            <td class="small">Verified genealogy listing all legal male and female heirs of deceased predecessor owners.</td>
-            <td class="small text-danger fw-semibold">Identifies co-sharers by inheritance who possess Section 96 SAT Act pre-emption rights.</td>
-          </tr>
-          <tr>
-            <td class="fw-semibold">
-              <i class="bi bi-folder-check text-primary me-1"></i>
-              Registered Partition Deed
-            </td>
-            <td>Sub-Registry Office</td>
-            <td class="small">Confirm execution and registration of a formal partition deed signed by all heirs.</td>
-            <td class="small text-success fw-semibold">Extinguishes joint tenancy; demarcates specific separate plot boundaries.</td>
-          </tr>
-          <tr>
-            <td class="fw-semibold">
-              <i class="bi bi-building text-warning me-1"></i>
-              Separate Mutation &amp; DCR
-            </td>
-            <td>AC (Land) Office</td>
-            <td class="small">Ensure seller has opened an independent Mutation Khatian, DCR receipt, and up-to-date land development tax dakhila.</td>
-            <td class="small text-success fw-semibold">Demonstrates separate fiscal assessment and segregated holding.</td>
-          </tr>
-          <tr>
-            <td class="fw-semibold">
-              <i class="bi bi-envelope-paper text-secondary me-1"></i>
-              Statutory Transfer Notice
-            </td>
-            <td>Sub-Registry Office</td>
-            <td class="small">Issuance of notice under Section 89 of the SAT Act or Section 23 of the NAT Act to recorded co-sharers.</td>
-            <td class="small text-warning fw-semibold">Restricts statutory limitation window (2 months for SAT Act, 4 months for NAT Act).</td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -565,18 +650,26 @@
     <div class="max-w-600 mx-auto">
       <i class="bi bi-mortarboard text-teal fs-2 mb-2"></i>
       <h5 class="fw-bold text-navy" style="color: var(--brand-navy-900);">
+        {% if current_lang == 'en' %}
         LandTech Hackathon 2026 Academic Innovation Prototype
+        {% else %}
+        ল্যান্ডটেক হ্যাকাথন ২০২৬ একাডেমিক ইনোভেশন প্রোটোটাইপ
+        {% endif %}
       </h5>
       <p class="text-secondary small mb-3">
-        Developed for educational demonstration under Track P5 (Citizen Pre-Purchase Verification) and P3 (Fraud &amp; Litigation Risk Prevention).
-        Designed to empower prospective buyers in Bangladesh with explainable, accessible legal literacy before entering land agreements.
+        {% if current_lang == 'en' %}
+        Prepared for Track P5 (Citizen Pre-Purchase Diligence) and P3 (Fraud &amp; Litigation Prevention). Designed to provide explainable pre-purchase awareness to prospective land purchasers in Bangladesh.
+        {% else %}
+        ট্র্যাক পি৫ (ক্রয়পূর্ব নাগরিক ভূমি যাচাই) এবং পি৩ (জালিয়াতি ও মামলা মোকদ্দমা প্রতিরোধ) এর জন্য প্রদর্শনী হিসেবে প্রস্তুতকৃত।
+        বাংলাদেশে জমি ক্রয়ের চুক্তি স্বাক্ষরের পূর্বে সাধারণ ক্রেতাদের ব্যাখ্যাযোগ্য আইনি সচেতনতা প্রদান করা এর লক্ষ্য।
+        {% endif %}
       </p>
       <div class="d-flex justify-content-center gap-2">
         <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-sm">
-          <i class="bi bi-grid-3x3-gap me-1"></i> Synthetic Plots Dashboard
+          <i class="bi bi-grid-3x3-gap me-1"></i> {{ t('nav_dashboard') }}
         </a>
         <a href="{{ url_for('standalone_checklist') }}" class="btn btn-teal btn-sm">
-          <i class="bi bi-check2-square me-1"></i> Citizen Verification Checklist
+          <i class="bi bi-check2-square me-1"></i> {{ t('nav_checklist') }}
         </a>
       </div>
     </div>
