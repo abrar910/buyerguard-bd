@@ -438,6 +438,154 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
 
     # -------------------------------------------------------------
+    # Complete Land Information (Sections A through G)
+    # -------------------------------------------------------------
+    "sec_a_title": {
+        "bn": "ক. জমির প্রাথমিক পরিচিতি",
+        "en": "A. Basic Land Identification",
+    },
+    "plot_attr_khatian_no": {
+        "bn": "খতিয়ান নম্বর",
+        "en": "Khatian Number",
+    },
+    "plot_attr_plot_no": {
+        "bn": "প্লট নম্বর",
+        "en": "Plot Number",
+    },
+    "plot_attr_dag_no": {
+        "bn": "দাগ নম্বর",
+        "en": "Dag Number",
+    },
+    "plot_attr_mouza_name": {
+        "bn": "মৌজার নাম",
+        "en": "Mouza Name",
+    },
+    "plot_attr_jl_no": {
+        "bn": "জে.এল. নম্বর",
+        "en": "J.L. Number (Mouza)",
+    },
+    "sec_b_title": {
+        "bn": "খ. দলিল ও রেজিস্ট্রেশনের তথ্য",
+        "en": "B. Deed & Registration Information",
+    },
+    "plot_attr_deed_no": {
+        "bn": "দলিল নম্বর",
+        "en": "Deed Number",
+    },
+    "plot_attr_reg_details": {
+        "bn": "দলিল নিবন্ধনের তথ্য",
+        "en": "Deed Registration Details",
+    },
+    "plot_attr_sub_registry": {
+        "bn": "সাব-রেজিস্ট্রি অফিসের নাম",
+        "en": "Sub-Registry Office Name",
+    },
+    "sec_c_title": {
+        "bn": "গ. নামজারি তথ্য",
+        "en": "C. Mutation Information",
+    },
+    "plot_attr_mutation_status": {
+        "bn": "নামজারি / ই-নামজারি",
+        "en": "Mutation / E-Namjari Status",
+    },
+    "sec_d_title": {
+        "bn": "ঘ. মামলা-সংক্রান্ত তথ্য",
+        "en": "D. Case & Litigation Information",
+    },
+    "plot_attr_case_info": {
+        "bn": "মামলা-সংক্রান্ত তথ্য",
+        "en": "Case & Litigation Information",
+    },
+    "sec_e_title": {
+        "bn": "ঙ. সরকারি স্বার্থ",
+        "en": "E. Government Interest",
+    },
+    "plot_attr_gov_interest": {
+        "bn": "সরকারি স্বার্থ / খাস বা অধিগ্রহণকৃত জমি",
+        "en": "Government Interest / Khas or Acquired Land",
+    },
+    "sec_f_title": {
+        "bn": "চ. জরিপ তথ্য",
+        "en": "F. Survey Information",
+    },
+    "plot_attr_survey_type": {
+        "bn": "জরিপের ধরন",
+        "en": "Survey Type",
+    },
+    "sec_g_title": {
+        "bn": "ছ. জমির মালিকানা অর্জনের উৎস",
+        "en": "G. Source of Ownership",
+    },
+    "plot_attr_ownership_source": {
+        "bn": "জমির মালিকানা অর্জনের উৎস",
+        "en": "Source of Ownership",
+    },
+    "plot_attr_partition_status": {
+        "bn": "আপস-বণ্টননামার অবস্থা",
+        "en": "Partition Deed Status",
+    },
+
+    # -------------------------------------------------------------
+    # Automated 7-Step Verification Workflow
+    # -------------------------------------------------------------
+    "auto_checklist_title": {
+        "bn": "৭-দফা স্বয়ংক্রিয় প্রাক-ক্রয় যাচাইকরণ",
+        "en": "7-Step Automated Pre-Purchase Verification",
+    },
+    "auto_checklist_subtitle": {
+        "bn": "সিলেক্টেড প্লটের ডাটাবেজ রেকর্ড ও উপলব্ধ দলিলের ভিত্তিতে স্বয়ংক্রিয়ভাবে মূল্যায়িত ফলাফল",
+        "en": "Automatically evaluated due diligence against selected plot records and evidence",
+    },
+    "auto_checklist_eval_label": {
+        "bn": "যাচাইকরণ ফলাফল: ৭টি স্বয়ংক্রিয় পরীক্ষা মূল্যায়িত",
+        "en": "Verification Results: 7 Checks Evaluated",
+    },
+    "auto_checklist_passed": {
+        "bn": "উত্তীর্ণ",
+        "en": "Passed",
+    },
+    "auto_checklist_warnings": {
+        "bn": "সতর্কবার্তা",
+        "en": "Warnings",
+    },
+    "auto_checklist_review": {
+        "bn": "পর্যালোচনা প্রয়োজন",
+        "en": "Needs Review",
+    },
+    "auto_checklist_insufficient": {
+        "bn": "তথ্য অপ্রাপ্ত",
+        "en": "Insufficient Data",
+    },
+    "auto_checklist_na": {
+        "bn": "প্রযোজ্য নয়",
+        "en": "Not Applicable",
+    },
+    "auto_checklist_rerun": {
+        "bn": "পুনরায় যাচাই করুন",
+        "en": "Re-run Verification",
+    },
+    "auto_checklist_detected_conflicts": {
+        "bn": "শনাক্তকৃত অসঙ্গতি / সংঘাত:",
+        "en": "Detected Conflicts / Inconsistencies:",
+    },
+    "auto_checklist_missing_docs": {
+        "bn": "প্রয়োজনীয় অপ্রাপ্ত তথ্য / নথি:",
+        "en": "Missing Required Records / Information:",
+    },
+    "auto_checklist_recommended_action": {
+        "bn": "পরামর্শকৃত যাচাইকরণ পদক্ষেপ:",
+        "en": "Recommended Next Diligence Action:",
+    },
+    "auto_checklist_legal_notice": {
+        "bn": "স্বয়ংক্রিয় প্রাথমিক স্ক্রীনিং — আইনজীবী দ্বারা যাচাইকরণ এখনও আবশ্যক",
+        "en": "Automated Preliminary Screening — Advocate Review Still Required",
+    },
+    "city_survey_risk_indicator": {
+        "bn": "সিটি জরিপ স্ক্রীনিং সূচক (+১ পয়েন্ট)",
+        "en": "City Survey Screening Indicator (+1 Point)",
+    },
+
+    # -------------------------------------------------------------
     # Checklist (checklist.html)
     # -------------------------------------------------------------
     "checklist_page_title": {

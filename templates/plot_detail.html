@@ -18,15 +18,23 @@
     <div>
       <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
         <h2 class="fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
-          {% if current_lang == 'bn' %}প্লট রেকর্ড: {{ plot.plot_id }} <span class="small text-muted fw-normal fs-6">(Plot Record: {{ plot.plot_id }})</span>{% else %}Plot Record: {{ plot.plot_id }}{% endif %}
+          {% if current_lang == 'bn' %}প্লট রেকর্ড: {{ plot.plot_id }} <span class="small text-muted fw-normal fs-6">({{ plot.mouza_name or plot.demo_mouza_code }})</span>{% else %}Plot Record: {{ plot.plot_id }}{% endif %}
         </h2>
         <span class="badge bg-{{ assessment.status_badge }} px-3 py-1 font-monospace">
           {{ assessment.overall_status_display }}
         </span>
+        <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 font-monospace small">
+          {% if current_lang == 'bn' %}ঝুঁকি স্কোর: {{ assessment.risk_score }} পয়েন্ট{% else %}Risk Score: {{ assessment.risk_score }} pts{% endif %}
+        </span>
+        {% if assessment.city_survey_point_added %}
+          <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 small">
+            <i class="bi bi-building me-1"></i> {{ t('city_survey_risk_indicator') }}
+          </span>
+        {% endif %}
       </div>
       <p class="text-muted small mb-0">
         <i class="bi bi-geo-alt-fill text-teal me-1"></i>
-        {{ plot.demo_mouza_code }} &bull; {{ plot.demo_upazila }}, {{ plot.demo_district }}
+        {{ plot.mouza_name or plot.demo_mouza_code }} ({{ plot.demo_mouza_code }}) &bull; {{ plot.jl_no or '' }} &bull; {{ plot.demo_upazila }}, {{ plot.demo_district }}
       </p>
     </div>
 
@@ -34,6 +42,9 @@
     <div class="d-flex gap-2">
       <a href="{{ url_for('plot_report', plot_id=plot.plot_id) }}" class="btn btn-outline-secondary btn-sm" target="_blank">
         <i class="bi bi-printer me-1"></i> {{ t('plot_detail_btn_print') }}
+      </a>
+      <a href="{{ url_for('plot_detail', plot_id=plot.plot_id) }}" class="btn btn-outline-teal btn-sm" title="{{ t('auto_checklist_rerun') }}">
+        <i class="bi bi-arrow-repeat me-1"></i> {{ t('auto_checklist_rerun') }}
       </a>
       <a href="{{ url_for('dashboard') }}" class="btn btn-teal btn-sm">
         <i class="bi bi-grid-3x3-gap me-1"></i> {{ t('plot_detail_btn_dash') }}
@@ -43,13 +54,18 @@
 
   <!-- EXPLAINABLE VERIFICATION WARNINGS SECTION -->
   <div class="mb-4">
-    <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
       <h4 class="fw-bold mb-0 text-navy" style="color: var(--brand-navy-900);">
         <i class="bi bi-cpu text-info me-2"></i> {{ t('plot_rule_findings_title') }}
       </h4>
-      <span class="badge bg-light text-dark border">
-        {{ assessment.warning_count }} {{ t('plot_warning_indicators_evaluated') }}
-      </span>
+      <div class="d-flex gap-2 align-items-center">
+        <span class="badge bg-light text-dark border">
+          {{ assessment.warning_count }} {{ t('plot_warning_indicators_evaluated') }}
+        </span>
+        <span class="badge bg-light text-primary border">
+          {% if current_lang == 'bn' %}মোট ঝুঁকি স্কোর: {{ assessment.risk_score }}{% else %}Total Risk Score: {{ assessment.risk_score }}{% endif %}
+        </span>
+      </div>
     </div>
 
     {% if assessment.has_warnings %}
@@ -97,73 +113,221 @@
   </div>
 
   <div class="row g-4">
-    <!-- Left Column: Master Fields & Completeness -->
+    <!-- Left Column: Master Fields (Sections A through G) & Transaction History -->
     <div class="col-lg-7">
-      <!-- Master Records Card -->
+
+      <!-- Master Records Card with Sections A through G in exact specified order -->
       <div class="card card-custom mb-4">
         <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
           <span class="fw-bold"><i class="bi bi-folder2-open me-2 text-primary"></i> {{ t('plot_master_card_title') }}</span>
-          <span class="badge bg-light text-secondary border">SQLite</span>
+          <span class="badge bg-light text-secondary border">A–G Ordered Specifications</span>
         </div>
         <div class="card-body p-4">
-          <div class="row g-3">
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_plot_id') }}</span>
-              <span class="fw-bold fs-6">{{ plot.plot_id }}</span>
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_mouza') }}</span>
-              <span class="fw-semibold">{{ plot.demo_mouza_code }}</span>
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_area') }}</span>
-              <span>{{ plot.demo_upazila }}, {{ plot.demo_district }}</span>
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_deed') }}</span>
-              {% if plot.deed_ref %}
-                <code>{{ plot.deed_ref }}</code>
-              {% else %}
-                <span class="badge bg-warning-subtle text-warning">{{ t('not_available') }}</span>
-              {% endif %}
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_khatian') }}</span>
-              {% if plot.khatian_ref %}
-                <span class="fw-semibold">{{ plot.khatian_ref }}</span>
-              {% else %}
-                <span class="badge bg-warning-subtle text-warning">{{ t('not_available') }}</span>
-              {% endif %}
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_mutation') }}</span>
-              {% if 'mutated' in (plot.mutation_status or '')|lower %}
-                <span class="badge bg-success-subtle text-success">
-                  <i class="bi bi-check-circle"></i> {% if current_lang == 'bn' %}নামজারি সম্পন্ন{% else %}Mutated (Namjari Complete){% endif %}
-                </span>
-              {% elif 'pending' in (plot.mutation_status or '')|lower %}
-                <span class="badge bg-info-subtle text-info">
-                  <i class="bi bi-hourglass-split"></i> {% if current_lang == 'bn' %}প্রক্রিয়াধীন{% else %}Pending{% endif %}
-                </span>
-              {% else %}
-                <span class="badge bg-warning-subtle text-warning">
-                  <i class="bi bi-exclamation-circle"></i> {{ plot.mutation_status or t('not_available') }}
-                </span>
-              {% endif %}
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_case') }}</span>
-              <span class="small">{{ plot.case_info_status or t('not_available') }}</span>
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted small d-block">{{ t('plot_attr_khas') }}</span>
-              <span class="small">{{ plot.khas_acquisition_status or t('not_available') }}</span>
-            </div>
-            <div class="col-12 mt-2 pt-2 border-top">
-              <span class="text-muted small d-block">{% if current_lang == 'bn' %}বর্ণনা ও ডেমো প্রেক্ষাপট:{% else %}Scenario Description:{% endif %}</span>
-              <p class="small text-secondary mb-0">{{ plot.description }}</p>
+
+          <!-- Section A: Basic Land Identification -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+              <i class="bi bi-geo-alt-fill text-teal me-1"></i> {{ t('sec_a_title') }}
+            </h6>
+            <div class="row g-3">
+              <!-- 1. Khatian Number -->
+              <div class="col-sm-6 col-md-4">
+                <span class="text-muted small d-block">১. {{ t('plot_attr_khatian_no') }}</span>
+                {% if plot.khatian_ref %}
+                  <span class="fw-bold fs-6 text-dark font-monospace">{{ plot.khatian_ref }}</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning">{{ t('not_available') }}</span>
+                {% endif %}
+              </div>
+              <!-- 2. Plot Number -->
+              <div class="col-sm-6 col-md-4">
+                <span class="text-muted small d-block">২. {{ t('plot_attr_plot_no') }}</span>
+                <span class="fw-bold fs-6 text-dark font-monospace">{{ plot.plot_id }}</span>
+              </div>
+              <!-- 3. Dag Number (Cadastral, separate from Plot ID) -->
+              <div class="col-sm-6 col-md-4">
+                <span class="text-muted small d-block">৩. {{ t('plot_attr_dag_no') }}</span>
+                {% if plot.dag_no %}
+                  <span class="fw-bold fs-6 text-dark">{{ plot.dag_no }}</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning">{{ t('not_available') }}</span>
+                {% endif %}
+              </div>
+              <!-- 4. Mouza Name -->
+              <div class="col-sm-6 col-md-6">
+                <span class="text-muted small d-block">৪. {{ t('plot_attr_mouza_name') }}</span>
+                <span class="fw-semibold text-dark">{{ plot.mouza_name or plot.demo_mouza_code }} ({{ plot.demo_mouza_code }})</span>
+              </div>
+              <!-- 5. J.L. Number (associated with mouza, not district) -->
+              <div class="col-sm-6 col-md-6">
+                <span class="text-muted small d-block">৫. {{ t('plot_attr_jl_no') }} <span class="text-muted" style="font-size: 0.75rem;">({% if current_lang == 'bn' %}মৌজার জে.এল. নম্বর{% else %}Mouza J.L. No.{% endif %})</span></span>
+                <span class="fw-semibold text-dark">{{ plot.jl_no or t('not_available') }}</span>
+              </div>
+              <div class="col-12">
+                <span class="text-muted small d-block">{% if current_lang == 'bn' %}প্রশাসনিক অবস্থান:{% else %}Administrative Jurisdiction:{% endif %}</span>
+                <span class="small text-secondary">{{ plot.demo_upazila }}, {{ plot.demo_district }}</span>
+              </div>
             </div>
           </div>
+
+          <!-- Section B: Deed and Registration Information -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+              <i class="bi bi-file-earmark-text-fill text-primary me-1"></i> {{ t('sec_b_title') }}
+            </h6>
+            <div class="row g-3">
+              <!-- 6. Deed Number (No duplicate deed field) -->
+              <div class="col-sm-6 col-md-4">
+                <span class="text-muted small d-block">৬. {{ t('plot_attr_deed_no') }}</span>
+                {% if plot.deed_ref %}
+                  <code class="fw-bold fs-6 text-dark font-monospace">{{ plot.deed_ref }}</code>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning">{{ t('not_available') }}</span>
+                {% endif %}
+              </div>
+              <!-- 7. Deed Registration Details -->
+              <div class="col-sm-6 col-md-4">
+                <span class="text-muted small d-block">৭. {{ t('plot_attr_reg_details') }}</span>
+                {% if plot.reg_details or plot.reg_date %}
+                  <span class="small text-dark fw-medium">{{ plot.reg_details or '' }}{% if plot.reg_date %} ({{ plot.reg_date }}){% endif %}</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning">{{ t('not_available') }}</span>
+                {% endif %}
+              </div>
+              <!-- 8. Sub-Registry Office Name -->
+              <div class="col-sm-6 col-md-4">
+                <span class="text-muted small d-block">৮. {{ t('plot_attr_sub_registry') }}</span>
+                <span class="small text-dark fw-semibold">{{ plot.sub_registry_office or t('not_available') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section C: Mutation Information -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+              <i class="bi bi-check2-circle text-success me-1"></i> {{ t('sec_c_title') }}
+            </h6>
+            <div class="row g-3">
+              <!-- 9. Mutation / E-Namjari Status -->
+              <div class="col-12">
+                <span class="text-muted small d-block">৯. {{ t('plot_attr_mutation_status') }}</span>
+                {% if 'mutated' in (plot.mutation_status or '')|lower or 'complete' in (plot.mutation_status or '')|lower %}
+                  <span class="badge bg-success-subtle text-success fs-6 fw-semibold">
+                    <i class="bi bi-check-circle me-1"></i> {{ plot.mutation_status }}
+                  </span>
+                {% elif 'pending' in (plot.mutation_status or '')|lower %}
+                  <span class="badge bg-info-subtle text-info fs-6 fw-semibold">
+                    <i class="bi bi-hourglass-split me-1"></i> {{ plot.mutation_status }}
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning fs-6 fw-semibold">
+                    <i class="bi bi-exclamation-circle me-1"></i> {{ plot.mutation_status or t('not_available') }}
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section D: Case and Litigation Information -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+              <i class="bi bi-bank text-danger me-1"></i> {{ t('sec_d_title') }}
+            </h6>
+            <div class="row g-3">
+              <!-- 10. Case & Litigation Information -->
+              <div class="col-12">
+                <span class="text-muted small d-block">১০. {{ t('plot_attr_case_info') }}</span>
+                {% if 'suit' in (plot.case_details or plot.case_info_status or '')|lower or 'মামলা' in (plot.case_details or plot.case_info_status or '') %}
+                  <div class="p-2 bg-danger-subtle text-danger rounded border border-danger-subtle small fw-semibold">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ plot.case_details or plot.case_info_status }}
+                  </div>
+                {% elif 'unknown' in (plot.case_info_status or '')|lower or 'pending' in (plot.case_info_status or '')|lower %}
+                  <div class="p-2 bg-warning-subtle text-warning-emphasis rounded border border-warning-subtle small">
+                    <i class="bi bi-info-circle-fill me-1"></i> {{ plot.case_details or plot.case_info_status }} ({% if current_lang == 'bn' %}আদালত তল্লাশি আবশ্যক{% else %}Court search required{% endif %})
+                  </div>
+                {% else %}
+                  <div class="p-2 bg-success-subtle text-success rounded border border-success-subtle small">
+                    <i class="bi bi-shield-check me-1"></i> {{ plot.case_details or plot.case_info_status or t('not_available') }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section E: Government Interest -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+              <i class="bi bi-flag-fill text-warning me-1"></i> {{ t('sec_e_title') }}
+            </h6>
+            <div class="row g-3">
+              <!-- 11. Government Interest / Khas or Acquired Land -->
+              <div class="col-12">
+                <span class="text-muted small d-block">১১. {{ t('plot_attr_gov_interest') }}</span>
+                {% set gov_str = (plot.gov_interest_details or plot.khas_acquisition_status or '')|lower %}
+                {% if 'warning identified' in gov_str or ('khas' in gov_str and 'not marked' not in gov_str) %}
+                  <div class="p-2 bg-danger-subtle text-danger rounded border border-danger-subtle small fw-semibold">
+                    <i class="bi bi-exclamation-octagon-fill me-1"></i> {{ plot.gov_interest_details or plot.khas_acquisition_status }}
+                  </div>
+                {% elif 'unknown' in gov_str or 'pending' in gov_str or 'inquiry' in gov_str %}
+                  <div class="p-2 bg-warning-subtle text-warning-emphasis rounded border border-warning-subtle small">
+                    <i class="bi bi-question-circle-fill me-1"></i> {{ plot.gov_interest_details or plot.khas_acquisition_status }} ({% if current_lang == 'bn' %}এসি ল্যান্ড অফিসে যাচাইকরণ আবশ্যক{% else %}AC Land verification required{% endif %})
+                  </div>
+                {% else %}
+                  <div class="p-2 bg-success-subtle text-success rounded border border-success-subtle small">
+                    <i class="bi bi-check2-circle me-1"></i> {{ plot.gov_interest_details or plot.khas_acquisition_status or t('not_available') }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section F: Survey Information -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+              <i class="bi bi-compass text-info me-1"></i> {{ t('sec_f_title') }}
+            </h6>
+            <div class="row g-3">
+              <!-- 12. Survey Type -->
+              <div class="col-12">
+                <span class="text-muted small d-block">১২. {{ t('plot_attr_survey_type') }}</span>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <span class="badge bg-primary fs-6 px-3 py-1 font-monospace">{{ plot.survey_type or t('not_available') }}</span>
+                  {% if 'city' in (plot.survey_type or '')|lower or 'সিটি' in (plot.survey_type or '') %}
+                    <span class="badge bg-info-subtle text-info border border-info-subtle">
+                      <i class="bi bi-building me-1"></i> {% if current_lang == 'bn' %}সিটি/পৌর জরিপ (+১ ঝুঁকি পয়েন্ট সূচক প্রয়োগকৃত){% else %}City/Urban Survey (+1 Risk Point Applied){% endif %}
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section G: Source of Ownership -->
+          <div class="mb-3">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-900);">
+              <i class="bi bi-person-badge-fill text-secondary me-1"></i> {{ t('sec_g_title') }}
+            </h6>
+            <div class="row g-3">
+              <!-- 13. Source of Ownership -->
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">১৩. {{ t('plot_attr_ownership_source') }}</span>
+                <span class="fw-bold text-dark fs-6">{{ plot.ownership_source or t('not_available') }}</span>
+                {% if 'দাগ' in (plot.ownership_source or '') %}
+                  <small class="text-muted d-block mt-1">*{% if current_lang == 'bn' %}রেকর্ডে 'দাগ সূত্রে' উল্লেখিত; আইনি পরিভাষা নিশ্চিতকরণের জন্য কনফিগারযোগ্য রাখা হয়েছে{% else %}Recorded as 'Dag Sutre'; kept configurable for title counsel confirmation{% endif %}</small>
+                {% endif %}
+              </div>
+              <!-- Partition Deed Status -->
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">{{ t('plot_attr_partition_status') }}</span>
+                <span class="small fw-semibold text-secondary">{{ plot.partition_deed_status or t('not_available') }}</span>
+              </div>
+              <div class="col-12 mt-2 pt-2 border-top">
+                <span class="text-muted small d-block">{% if current_lang == 'bn' %}বর্ণনা ও ডেমো প্রেক্ষাপট:{% else %}Scenario Description:{% endif %}</span>
+                <p class="small text-secondary mb-0">{{ plot.description }}</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -266,59 +430,99 @@
       </div>
     </div>
 
-    <!-- Right Column: Interactive Diligence Checklist -->
+    <!-- Right Column: Automated 7-Step Verification Workflow -->
     <div class="col-lg-5">
-      <div class="card card-custom p-4 sticky-top" style="top: 85px;" id="verification-checklist" data-plot-id="{{ plot.plot_id }}">
+      {% set due = assessment.due_diligence %}
+      <div class="card card-custom p-4 sticky-top" style="top: 85px;" id="automated-diligence-card">
         <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-          <span class="fw-bold">
-            <i class="bi bi-card-checklist me-2 text-teal"></i>
-            {% if current_lang == 'bn' %}নাগরিক প্রাক-ক্রয় চেকলিস্ট <span class="small text-muted fw-normal">(Citizen Pre-Purchase Checklist)</span>{% else %}Citizen Pre-Purchase Checklist{% endif %}
-          </span>
-          <button id="checklist-reset-btn" class="btn btn-outline-secondary btn-sm" title="{% if current_lang == 'bn' %}রিসেট{% else %}Reset{% endif %}">
-            <i class="bi bi-arrow-counterclockwise"></i>
-          </button>
-        </div>
-
-        <p class="small text-muted mb-3">
-          {% if current_lang == 'bn' %}
-            এই প্লটের জন্য নাগরিক যাচাইকরণ অগ্রগতি ট্র্যাক করুন। এটি আপনার ব্রাউজারে সংরক্ষিত থাকবে।
-          {% else %}
-            Track verified diligence steps for this plot. Completion state persists locally in your browser.
-          {% endif %}
-        </p>
-
-        <!-- Live Progress -->
-        <div class="mb-3">
-          <div class="d-flex justify-content-between align-items-center small mb-1">
-            <span class="text-muted">{{ t('checklist_progress_label') }}</span>
-            <span class="fw-bold text-teal">
-              <span id="checklist-completed-count">0</span> / <span id="checklist-total-count">7</span> {{ t('checklist_completed_count_suffix') }}
+          <div>
+            <span class="fw-bold d-block text-navy" style="color: var(--brand-navy-900);">
+              <i class="bi bi-shield-check me-1 text-teal"></i>
+              {% if current_lang == 'bn' %}
+                {{ t('auto_checklist_title') }} <span class="small text-muted fw-normal fs-6">(Citizen Pre-Purchase Checklist)</span>
+              {% else %}
+                Citizen Pre-Purchase Checklist (7-Step Automated Verification)
+              {% endif %}
             </span>
+            <small class="text-muted">{{ t('auto_checklist_eval_label') }}</small>
           </div>
-          <div class="progress" style="height: 6px;">
-            <div id="checklist-progress-bar" class="progress-bar bg-teal" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
+          <a href="{{ url_for('plot_detail', plot_id=plot.plot_id) }}" class="btn btn-outline-secondary btn-sm" title="{{ t('auto_checklist_rerun') }}">
+            <i class="bi bi-arrow-repeat"></i>
+          </a>
         </div>
 
-        <!-- 7 Checkpoints -->
-        <div class="d-flex flex-column gap-2">
-          {% for item in checklist_items %}
-          <label class="checklist-item p-2 rounded-2 border" for="plot-{{ plot.plot_id }}-{{ item.id }}">
-            <input type="checkbox" id="plot-{{ plot.plot_id }}-{{ item.id }}" class="checklist-checkbox" data-item-id="{{ item.id }}">
-            <div class="flex-grow-1 small">
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-semibold text-navy">{{ item.number }}. {{ item.title }}</span>
-                <span class="badge bg-light text-muted border" style="font-size: 0.65rem;">{{ item.authority }}</span>
+        <!-- Summary Chips Counter (Evaluated from actual plot results) -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+            <i class="bi bi-check-circle me-1"></i> {{ due.passed_count }} {{ t('auto_checklist_passed') }}
+          </span>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+            <i class="bi bi-exclamation-octagon me-1"></i> {{ due.warning_count }} {{ t('auto_checklist_warnings') }}
+          </span>
+          <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1">
+            <i class="bi bi-exclamation-triangle me-1"></i> {{ due.needs_review_count }} {{ t('auto_checklist_review') }}
+          </span>
+          {% if due.insufficient_data_count > 0 %}
+          <span class="badge bg-secondary-subtle text-secondary border px-2 py-1">
+            <i class="bi bi-question-circle me-1"></i> {{ due.insufficient_data_count }} {{ t('auto_checklist_insufficient') }}
+          </span>
+          {% endif %}
+          {% if due.not_applicable_count > 0 %}
+          <span class="badge bg-light text-muted border px-2 py-1">
+            {{ due.not_applicable_count }} {{ t('auto_checklist_na') }}
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- 7 Automated Diligence Result Items -->
+        <div class="d-flex flex-column gap-3">
+          {% for check in due.checks %}
+          <div class="p-3 rounded-3 border bg-white shadow-sm" style="border-left: 4px solid var(--bs-{{ check.badge_class }}) !important;">
+            <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+              <div class="fw-bold text-navy small">
+                {{ check.step_number }}. {{ check.title }}
               </div>
-              <p class="text-muted mb-0" style="font-size: 0.775rem;">
-                {{ item.desc }}
-              </p>
+              <span class="badge bg-{{ check.badge_class }} text-uppercase font-monospace" style="font-size: 0.7rem;">
+                {{ check.status_label }}
+              </span>
             </div>
-          </label>
+
+            <p class="text-secondary small mb-2" style="font-size: 0.8rem; line-height: 1.4;">
+              {{ check.explanation }}
+            </p>
+
+            {% if check.conflicts %}
+              <div class="mb-2 p-2 bg-danger-subtle text-danger rounded border border-danger-subtle" style="font-size: 0.775rem;">
+                <strong><i class="bi bi-exclamation-diamond me-1"></i> {{ t('auto_checklist_detected_conflicts') }}</strong> {{ check.conflicts }}
+              </div>
+            {% endif %}
+
+            {% if check.missing_info %}
+              <div class="mb-2 p-2 bg-warning-subtle text-warning-emphasis rounded border border-warning-subtle" style="font-size: 0.775rem;">
+                <strong><i class="bi bi-info-circle me-1"></i> {{ t('auto_checklist_missing_docs') }}</strong> {{ check.missing_info }}
+              </div>
+            {% endif %}
+
+            {% if check.check_id == 'step_7_legal_readiness' %}
+              <div class="p-2 mb-2 bg-light rounded border text-navy fw-semibold small">
+                <i class="bi bi-briefcase me-1 text-primary"></i>
+                {% if current_lang == 'bn' %}মূল্যায়ন ফলাফল:{% else %}Assessment Outcome:{% endif %}
+                <span class="badge bg-{{ check.badge_class }} ms-1">{{ check.readiness_outcome }}</span>
+                <div class="text-muted fw-normal mt-1" style="font-size: 0.75rem;">
+                  * {{ t('auto_checklist_legal_notice') }}
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="pt-2 border-top text-dark" style="font-size: 0.775rem;">
+              <span class="text-muted">{{ t('auto_checklist_recommended_action') }}</span>
+              <span class="fw-semibold">{{ check.recommended_action }}</span>
+            </div>
+          </div>
           {% endfor %}
         </div>
 
-        <div class="mt-3 pt-3 border-top text-center">
+        <div class="mt-4 pt-3 border-top text-center d-flex flex-column gap-2">
           <a href="{{ url_for('plot_report', plot_id=plot.plot_id) }}" class="btn btn-outline-teal btn-sm w-100" target="_blank">
             <i class="bi bi-printer me-1"></i> {{ t('plot_detail_btn_print') }}
           </a>

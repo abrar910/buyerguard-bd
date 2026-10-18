@@ -21,71 +21,154 @@
             {{ t('checklist_page_title') }}
           </h2>
           <p class="text-muted small mb-0">
-            {{ t('checklist_page_subtitle') }}
+            {{ t('auto_checklist_subtitle') }}
           </p>
         </div>
 
-        <div class="d-flex gap-2">
-          <button id="checklist-reset-btn" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-counterclockwise me-1"></i> {{ t('checklist_reset_btn') }}
-          </button>
-          <button class="btn btn-teal btn-sm" data-action="print-report">
+        <div class="d-flex gap-2 align-items-center">
+          {% if selected_plot %}
+          <a href="{{ url_for('plot_report', plot_id=selected_plot.plot_id) }}" class="btn btn-outline-teal btn-sm" target="_blank">
             <i class="bi bi-printer me-1"></i> {{ t('checklist_print_btn') }}
-          </button>
+          </a>
+          <a href="{{ url_for('plot_detail', plot_id=selected_plot.plot_id) }}" class="btn btn-teal btn-sm">
+            <i class="bi bi-folder2-open me-1"></i> {% if current_lang == 'bn' %}প্লটের সম্পূর্ণ বিবরণী{% else %}Full Plot Details{% endif %}
+          </a>
+          {% endif %}
         </div>
       </div>
 
-      <!-- Checklist Container -->
-      <div class="card card-custom p-4 mb-4 bg-white shadow-sm" id="verification-checklist" data-plot-id="global">
-
-        <!-- Live Progress -->
-        <div class="mb-4 pb-3 border-bottom">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="fw-semibold text-navy">{{ t('checklist_progress_label') }}</span>
-            <span class="fw-bold text-teal" style="color: var(--brand-teal-600);">
-              <span id="checklist-completed-count">0</span> / <span id="checklist-total-count">7</span> {{ t('checklist_completed_count_suffix') }}
-            </span>
+      <!-- Plot Selector Banner -->
+      <div class="card card-custom p-3 mb-4 bg-white shadow-sm border">
+        <form method="get" action="{{ url_for('standalone_checklist') }}" class="row g-2 align-items-center">
+          <div class="col-md-3">
+            <label for="plot-select" class="small fw-bold text-navy mb-0">
+              <i class="bi bi-geo-alt-fill text-teal me-1"></i>
+              {% if current_lang == 'bn' %}যাচাইয়ের জন্য প্লট নির্বাচন করুন:{% else %}Select Plot to Verify:{% endif %}
+            </label>
           </div>
-          <div class="progress" style="height: 10px;">
-            <div id="checklist-progress-bar" class="progress-bar" role="progressbar" style="width: 0%; background-color: var(--brand-teal-600);" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+          <div class="col-md-6">
+            <select name="plot" id="plot-select" class="form-select form-select-sm font-monospace" onchange="this.form.submit()">
+              {% for p in plots %}
+                <option value="{{ p.plot_id }}" {% if selected_plot and selected_plot.plot_id == p.plot_id %}selected{% endif %}>
+                  {{ p.plot_id }} — {{ p.mouza_name or p.demo_mouza_code }} ({{ p.dag_no or 'দাগ অপ্রাপ্ত' }}) &bull; {{ p.survey_type or 'জরিপ অপ্রাপ্ত' }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-teal btn-sm w-100">
+              <i class="bi bi-arrow-repeat me-1"></i> {{ t('auto_checklist_rerun') }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {% if selected_plot and assessment %}
+      {% set due = assessment.due_diligence %}
+      <!-- Checklist Container -->
+      <div class="card card-custom p-4 mb-4 bg-white shadow-sm" id="automated-checklist-container">
+
+        <!-- Plot Header Banner -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-3 border-bottom gap-2">
+          <div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h5 class="fw-bold mb-0 text-navy font-monospace">{{ selected_plot.plot_id }}</h5>
+              <span class="badge bg-{{ assessment.status_badge }} px-2 py-1 font-monospace">
+                {{ assessment.overall_status_display }}
+              </span>
+              <span class="badge bg-light text-primary border font-monospace">
+                {% if current_lang == 'bn' %}ঝুঁকি স্কোর: {{ assessment.risk_score }} পয়েন্ট{% else %}Risk Score: {{ assessment.risk_score }} pts{% endif %}
+              </span>
+            </div>
+            <div class="text-muted small mt-1">
+              {{ selected_plot.mouza_name or selected_plot.demo_mouza_code }} &bull; {{ selected_plot.dag_no or '' }} &bull; {{ selected_plot.demo_upazila }}, {{ selected_plot.demo_district }}
+            </div>
+          </div>
+
+          <!-- Summary Chips -->
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+              <i class="bi bi-check-circle me-1"></i> {{ due.passed_count }} {{ t('auto_checklist_passed') }}
+            </span>
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+              <i class="bi bi-exclamation-octagon me-1"></i> {{ due.warning_count }} {{ t('auto_checklist_warnings') }}
+            </span>
+            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1">
+              <i class="bi bi-exclamation-triangle me-1"></i> {{ due.needs_review_count }} {{ t('auto_checklist_review') }}
+            </span>
+            {% if due.insufficient_data_count > 0 %}
+            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1">
+              <i class="bi bi-question-circle me-1"></i> {{ due.insufficient_data_count }} {{ t('auto_checklist_insufficient') }}
+            </span>
+            {% endif %}
           </div>
         </div>
 
-        <!-- 7 Actionable Tasks with Bangladesh Details -->
+        <!-- 7 Automated Checks -->
         <div class="d-flex flex-column gap-3">
-          {% for item in checklist_items %}
-          <label class="checklist-item p-3 rounded-3" for="item-{{ loop.index }}">
-            <input type="checkbox" id="item-{{ loop.index }}" class="checklist-checkbox" data-item-id="{{ item.id }}">
-            <div class="flex-grow-1">
-              <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
-                <span class="fw-bold item-title text-navy">{{ item.number }}. {{ item.title }}</span>
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ item.authority }}</span>
+          {% for check in due.checks %}
+          <div class="p-3 rounded-3 border bg-light bg-opacity-50" style="border-left: 4px solid var(--bs-{{ check.badge_class }}) !important;">
+            <div class="d-flex justify-content-between align-items-start mb-2 gap-2 flex-wrap">
+              <div class="fw-bold text-navy">
+                <span class="badge bg-{{ check.badge_class }} me-1 font-monospace">{{ check.step_number }}</span>
+                {{ check.title }}
               </div>
-              <p class="text-secondary small mb-1">
-                {{ item.desc }}
-              </p>
+              <span class="badge bg-{{ check.badge_class }} text-uppercase font-monospace">
+                {{ check.status_label }}
+              </span>
             </div>
-          </label>
+
+            <p class="text-secondary small mb-2">
+              {{ check.explanation }}
+            </p>
+
+            {% if check.conflicts %}
+              <div class="mb-2 p-2 bg-danger-subtle text-danger rounded border border-danger-subtle small">
+                <strong><i class="bi bi-exclamation-diamond me-1"></i> {{ t('auto_checklist_detected_conflicts') }}</strong> {{ check.conflicts }}
+              </div>
+            {% endif %}
+
+            {% if check.missing_info %}
+              <div class="mb-2 p-2 bg-warning-subtle text-warning-emphasis rounded border border-warning-subtle small">
+                <strong><i class="bi bi-info-circle me-1"></i> {{ t('auto_checklist_missing_docs') }}</strong> {{ check.missing_info }}
+              </div>
+            {% endif %}
+
+            {% if check.check_id == 'step_7_legal_readiness' %}
+              <div class="p-2 mb-2 bg-white border rounded small fw-semibold text-navy">
+                <i class="bi bi-briefcase text-primary me-1"></i>
+                {% if current_lang == 'bn' %}আইনি পর্যালোচনার প্রস্তুতি:{% else %}Legal Review Readiness Outcome:{% endif %}
+                <span class="badge bg-{{ check.badge_class }} ms-1">{{ check.readiness_outcome }}</span>
+                <div class="text-muted fw-normal mt-1" style="font-size: 0.75rem;">
+                  * {{ t('auto_checklist_legal_notice') }}
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="pt-2 border-top text-dark small">
+              <span class="text-muted">{{ t('auto_checklist_recommended_action') }}</span>
+              <span class="fw-semibold">{{ check.recommended_action }}</span>
+            </div>
+          </div>
           {% endfor %}
         </div>
 
         <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
           <span class="text-muted small">
-            {% if current_lang == 'en' %}
-            Your checklist progress is stored automatically in your local browser storage.
-            {% else %}
-            আপনার চেকলিস্টের অগ্রগতি ব্রাউজারে স্বয়ংক্রিয়ভাবে সংরক্ষিত থাকে।
-            {% endif %}
+            * {{ t('auto_checklist_legal_notice') }}
           </span>
-          <a href="{{ url_for('dashboard') }}" class="btn btn-teal btn-sm">
-            {% if current_lang == 'en' %}
-            Explore Demo Plots <i class="bi bi-arrow-right ms-1"></i>
-            {% else %}
-            কাল্পনিক প্লট যাচাই করুন <i class="bi bi-arrow-right ms-1"></i>
-            {% endif %}
-          </a>
+          <div class="d-flex gap-2">
+            <a href="{{ url_for('plot_detail', plot_id=selected_plot.plot_id) }}" class="btn btn-teal btn-sm">
+              {% if current_lang == 'en' %}
+              Inspect Plot Records <i class="bi bi-arrow-right ms-1"></i>
+              {% else %}
+              প্লটের মূল রেকর্ড পরীক্ষা করুন <i class="bi bi-arrow-right ms-1"></i>
+              {% endif %}
+            </a>
+          </div>
         </div>
       </div>
+      {% endif %}
 
     </div>
   </div>

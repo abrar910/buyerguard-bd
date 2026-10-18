@@ -22,7 +22,7 @@
   </div>
 
   <!-- Formal Printable Report Card -->
-  <div class="card p-4 p-md-5 shadow-sm border bg-white" style="max-width: 900px; margin: 0 auto;">
+  <div class="card p-4 p-md-5 shadow-sm border bg-white" style="max-width: 920px; margin: 0 auto;">
 
     <!-- Header -->
     <div class="border-bottom pb-4 mb-4">
@@ -61,92 +61,159 @@
       </div>
     </div>
 
-    <!-- Plot Summary Grid -->
+    <!-- Section 1: Complete Land Information (Ordered A through G) -->
     <div class="mb-4">
       <h5 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-800);">
-        {{ t('report_sec1_title') }}
+        {% if current_lang == 'en' %}1. Complete Land Identification &amp; Record Details{% else %}১. জমির পূর্ণাঙ্গ পরিচিতি ও রেকর্ড বিবরণ{% endif %}
       </h5>
       <div class="row g-3 small">
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{{ t('th_plot_id') }}:</span>
-          <strong class="fs-6 text-dark">{{ plot.plot_id }}</strong>
+        <!-- A. Basic Identification -->
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">১. {{ t('plot_attr_khatian_no') }}:</span>
+          <strong class="fs-6 text-dark font-monospace">{{ plot.khatian_ref or t('not_available') }}</strong>
         </div>
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{{ t('th_mouza') }}:</span>
-          <strong>{{ plot.demo_mouza_code }}</strong>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">২. {{ t('plot_attr_plot_no') }}:</span>
+          <strong class="fs-6 text-dark font-monospace">{{ plot.plot_id }}</strong>
         </div>
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{% if current_lang == 'en' %}Upazila:{% else %}উপজেলা:{% endif %}</span>
-          <strong>{{ plot.demo_upazila }}</strong>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">৩. {{ t('plot_attr_dag_no') }}:</span>
+          <strong class="fs-6 text-dark">{{ plot.dag_no or t('not_available') }}</strong>
         </div>
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{% if current_lang == 'en' %}District:{% else %}জেলা:{% endif %}</span>
-          <strong>{{ plot.demo_district }}</strong>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">৪. {{ t('plot_attr_mouza_name') }}:</span>
+          <strong class="text-dark">{{ plot.mouza_name or plot.demo_mouza_code }} ({{ plot.demo_mouza_code }})</strong>
+        </div>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">৫. {{ t('plot_attr_jl_no') }}:</span>
+          <strong class="text-dark">{{ plot.jl_no or t('not_available') }}</strong>
+        </div>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">প্রশাসনিক অধিক্ষেত্র:</span>
+          <span>{{ plot.demo_upazila }}, {{ plot.demo_district }}</span>
         </div>
 
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{{ t('th_deed_ref') }}:</span>
-          <code class="text-break">{{ plot.deed_ref or ('Not in Record' if current_lang == 'en' else 'রেকর্ডে অপ্রাপ্ত') }}</code>
+        <!-- B. Deed & Registration -->
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">৬. {{ t('plot_attr_deed_no') }}:</span>
+          <code class="text-break">{{ plot.deed_ref or t('not_available') }}</code>
         </div>
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{{ t('th_khatian_ref') }}:</span>
-          <code class="text-break">{{ plot.khatian_ref or ('Not in Record' if current_lang == 'en' else 'রেকর্ডে অপ্রাপ্ত') }}</code>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">৭. {{ t('plot_attr_reg_details') }}:</span>
+          <span>{{ plot.reg_details or '' }}{% if plot.reg_date %} ({{ plot.reg_date }}){% endif %}</span>
         </div>
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{{ t('th_mutation') }}:</span>
-          <strong>{{ plot.mutation_status or ('Absent' if current_lang == 'en' else 'অনুপস্থিত') }}</strong>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">৮. {{ t('plot_attr_sub_registry') }}:</span>
+          <strong>{{ plot.sub_registry_office or t('not_available') }}</strong>
         </div>
-        <div class="col-6 col-sm-3">
-          <span class="text-muted d-block">{{ t('th_completeness') }}:</span>
-          <strong>{{ assessment.completeness.percentage }}% ({{ assessment.completeness.present_count }}/{{ assessment.completeness.total_count }} {% if current_lang == 'en' %}elements{% else %}টি উপাদান{% endif %})</strong>
+
+        <!-- C. Mutation -->
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">৯. {{ t('plot_attr_mutation_status') }}:</span>
+          <strong>{{ plot.mutation_status or t('not_available') }}</strong>
+        </div>
+
+        <!-- D. Case / Litigation -->
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">১০. {{ t('plot_attr_case_info') }}:</span>
+          <strong class="{% if 'suit' in (plot.case_details or plot.case_info_status or '')|lower %}text-danger{% endif %}">
+            {{ plot.case_details or plot.case_info_status or t('not_available') }}
+          </strong>
+        </div>
+
+        <!-- E. Government Interest -->
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">১১. {{ t('plot_attr_gov_interest') }}:</span>
+          <strong>{{ plot.gov_interest_details or plot.khas_acquisition_status or t('not_available') }}</strong>
+        </div>
+
+        <!-- F. Survey Type -->
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">১২. {{ t('plot_attr_survey_type') }}:</span>
+          <span class="badge bg-primary px-2 py-1 font-monospace">{{ plot.survey_type or t('not_available') }}</span>
+        </div>
+
+        <!-- G. Ownership Source -->
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">১৩. {{ t('plot_attr_ownership_source') }}:</span>
+          <strong>{{ plot.ownership_source or t('not_available') }}</strong>
+        </div>
+        <div class="col-6 col-sm-4">
+          <span class="text-muted d-block">{{ t('plot_attr_partition_status') }}:</span>
+          <span>{{ plot.partition_deed_status or t('not_available') }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Explainable Warnings Summary -->
+    <!-- Section 2: Automated 7-Step Verification Results -->
     <div class="mb-4">
       <h5 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-800);">
-        {{ t('report_sec2_title') }}
+        {% if current_lang == 'en' %}2. Automated 7-Step Pre-Purchase Due Diligence Assessment{% else %}২. ৭-দফা স্বয়ংক্রিয় প্রাক-ক্রয় যাচাইকরণ ফলাফল{% endif %}
       </h5>
 
-      <div class="d-flex align-items-center gap-2 mb-3">
-        <span class="text-muted small">{% if current_lang == 'en' %}Overall Evaluation Status:{% else %}সার্বিক মূল্যায়ন স্ট্যাটাস:{% endif %}</span>
+      <!-- Summary metrics -->
+      {% set due = assessment.due_diligence %}
+      <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+        <span class="text-muted small">{% if current_lang == 'en' %}Overall Screening Status:{% else %}সার্বিক মূল্যায়ন স্ট্যাটাস:{% endif %}</span>
         <span class="badge bg-{{ assessment.status_badge }} px-3 py-1 print-badge">
-          {{ assessment.overall_status_display or assessment.overall_status_bn or assessment.overall_status }}
+          {{ assessment.overall_status_display }}
+        </span>
+        <span class="badge bg-light text-dark border px-2 py-1">
+          {{ due.passed_count }} Passed / {{ due.warning_count }} Warnings / {{ due.needs_review_count }} Review
+        </span>
+        <span class="badge bg-light text-primary border px-2 py-1">
+          {% if current_lang == 'en' %}Risk Score: {{ assessment.risk_score }} pts{% else %}ঝুঁকি স্কোর: {{ assessment.risk_score }} পয়েন্ট{% endif %}
         </span>
       </div>
 
-      {% if assessment.has_warnings %}
-        <div class="d-flex flex-column gap-3">
-          {% for w in assessment.warnings %}
-            <div class="border rounded-2 p-3 bg-light" style="page-break-inside: avoid; break-inside: avoid;">
-              <div class="d-flex justify-content-between align-items-start mb-1 flex-wrap gap-2">
-                <strong><i class="bi bi-flag-fill text-{{ w.badge_class }} me-1"></i> {{ w.title }}</strong>
-                <span class="badge bg-secondary font-monospace">{{ w.rule_id }}</span>
-              </div>
-              <p class="small text-secondary mb-2">{{ w.explanation }}</p>
-              <div class="small">
-                <strong>{% if current_lang == 'en' %}Recommended Diligence Action:{% else %}পরামর্শকৃত যাচাইকরণ পদক্ষেপ:{% endif %}</strong> {{ w.recommended_action }}
+      <!-- 7 Steps Table -->
+      <div class="d-flex flex-column gap-2">
+        {% for check in due.checks %}
+        <div class="border rounded-2 p-3 bg-light" style="page-break-inside: avoid; break-inside: avoid;">
+          <div class="d-flex justify-content-between align-items-start mb-1 flex-wrap gap-2">
+            <strong>
+              <span class="badge bg-{{ check.badge_class }} me-1">{{ check.step_number }}</span>
+              {{ check.title }}
+            </strong>
+            <span class="badge bg-{{ check.badge_class }} text-uppercase font-monospace">{{ check.status_label }}</span>
+          </div>
+          <p class="small text-secondary mb-1">{{ check.explanation }}</p>
+
+          {% if check.conflicts %}
+            <div class="text-danger small mb-1">
+              <strong><i class="bi bi-exclamation-diamond me-1"></i> {{ t('auto_checklist_detected_conflicts') }}</strong> {{ check.conflicts }}
+            </div>
+          {% endif %}
+
+          {% if check.missing_info %}
+            <div class="text-warning-emphasis small mb-1">
+              <strong><i class="bi bi-info-circle me-1"></i> {{ t('auto_checklist_missing_docs') }}</strong> {{ check.missing_info }}
+            </div>
+          {% endif %}
+
+          {% if check.check_id == 'step_7_legal_readiness' %}
+            <div class="p-2 my-1 bg-white border rounded small fw-semibold text-navy">
+              <i class="bi bi-briefcase text-primary me-1"></i>
+              {% if current_lang == 'bn' %}আইনি পর্যালোচনার প্রস্তুতি:{% else %}Legal Review Readiness Outcome:{% endif %}
+              <span class="badge bg-{{ check.badge_class }}">{{ check.readiness_outcome }}</span>
+              <div class="text-muted fw-normal mt-1" style="font-size: 0.75rem;">
+                * {{ t('auto_checklist_legal_notice') }}
               </div>
             </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="p-3 border rounded-2 bg-light small text-success">
-          <i class="bi bi-check-circle-fill me-1"></i>
-          {% if current_lang == 'en' %}
-          No warning indicators or conflicting conveyance claims detected in the demo data.
-          {% else %}
-          এই কাল্পনিক ডেমো রেকর্ডে কোনো অসঙ্গতি বা বিরোধপূর্ণ বিক্রয় দাবি সনাক্ত হয়নি।
           {% endif %}
+
+          <div class="small text-dark mt-1 pt-1 border-top border-secondary border-opacity-10">
+            <strong>{{ t('auto_checklist_recommended_action') }}</strong> {{ check.recommended_action }}
+          </div>
         </div>
-      {% endif %}
+        {% endfor %}
+      </div>
     </div>
 
-    <!-- Transaction Summary -->
+    <!-- Section 3: Conveyance History -->
     <div class="mb-4">
       <h5 class="fw-bold text-navy border-bottom pb-2 mb-3" style="color: var(--brand-navy-800);">
-        {{ t('report_sec3_title') }}
+        {% if current_lang == 'en' %}3. Conveyance &amp; Transaction History Chain{% else %}৩. হস্তান্তর ও লেনদেনের ধারাবাহিক ইতিহাস{% endif %}
       </h5>
       <div class="table-responsive">
         <table class="table table-bordered table-sm small mb-0">
@@ -162,9 +229,9 @@
           </thead>
           <tbody>
             {% for tx in transactions %}
-            <tr>
+            <tr {% if tx.conflict_group_id %}class="table-danger"{% endif %}>
               <td class="text-break"><code>{{ tx.transaction_ref }}</code></td>
-              <td class="text-break"><code>{{ tx.deed_ref or ('N/A' if current_lang == 'en' else 'প্রযোজ্য নয়') }}</code></td>
+              <td class="text-break"><code>{{ tx.deed_ref or t('not_available') }}</code></td>
               <td>{{ tx.transaction_type }}</td>
               <td>{{ tx.transaction_date }}</td>
               <td>{{ tx.record_status }}</td>

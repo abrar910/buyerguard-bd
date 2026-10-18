@@ -257,10 +257,28 @@ def plot_report(plot_id: str):
 @app.route("/checklist")
 def standalone_checklist():
     """
-    Interactive standalone Pre-Purchase Verification Checklist for citizens,
-    explaining essential verification stages under Bangladesh land practice.
+    Automated Pre-Purchase Verification Checklist for citizens.
+    Automatically evaluates the 7 due-diligence checks against a selected
+    demo plot from the database, eliminating contradictory manual checkboxes.
     """
-    return render_template("checklist.html")
+    lang = getattr(g, "lang", "bn")
+    plots = get_all_plots()
+    selected_plot_id = request.args.get("plot", "").strip() or "PLOT-1001"
+
+    selected_plot = get_plot_by_id(selected_plot_id) or (plots[0] if plots else None)
+    assessment = None
+    txs = []
+    if selected_plot:
+        txs = get_transactions_for_plot(selected_plot["plot_id"])
+        assessment = RiskEngine.evaluate_plot(selected_plot, txs, lang=lang)
+
+    return render_template(
+        "checklist.html",
+        plots=plots,
+        selected_plot=selected_plot,
+        assessment=assessment,
+        transactions=txs,
+    )
 
 
 @app.route("/haq-shufa-guide", methods=["GET", "POST"])
