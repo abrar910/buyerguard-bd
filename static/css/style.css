@@ -3,7 +3,7 @@
   --bg-primary: #f8fafc;
   --bg-surface: #ffffff;
   --bg-surface-elevated: #f1f5f9;
-  
+
   --brand-navy-900: #0a192f;
   --brand-navy-800: #0f2744;
   --brand-navy-700: #1e3a8a;
@@ -19,7 +19,7 @@
   --text-secondary: #475569;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
-  
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
@@ -32,7 +32,7 @@
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', 'SolaimanLipi', 'Kalpurush', 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -418,6 +418,11 @@ footer .badge.bg-dark {
 
 /* Print Specific Styles */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 1.2cm;
+  }
+
   .no-print,
   .demo-banner,
   .navbar-custom,
@@ -429,15 +434,25 @@ footer .badge.bg-dark {
 
   body {
     background-color: white !important;
-    color: black !important;
-    font-size: 11pt;
+    color: #111827 !important;
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+
+  .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .card-custom,
   .card {
-    border: 1px solid #ccc !important;
+    border: 1px solid #cbd5e1 !important;
     box-shadow: none !important;
     margin-bottom: 1rem !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .print-only-header {
@@ -448,9 +463,39 @@ footer .badge.bg-dark {
   }
 
   .print-badge {
-    border: 1px solid #000 !important;
+    border: 1px solid #475569 !important;
     padding: 2px 6px !important;
-    font-size: 9pt !important;
+    font-size: 8.5pt !important;
+    color: #0f172a !important;
+    background-color: #f1f5f9 !important;
+  }
+
+  table {
+    width: 100% !important;
+    page-break-inside: auto;
+    border-collapse: collapse !important;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  th, td {
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    font-size: 8.5pt !important;
+    padding: 5px 6px !important;
+  }
+
+  .signature-block,
+  .report-disclaimer-box {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   a[href]:after {

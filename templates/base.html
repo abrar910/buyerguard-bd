@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_lang }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{{ app_name }} — {{ tagline }}{% endblock %}</title>
-  <meta name="description" content="BuyerGuard BD is an explainable LandTech prototype for citizen pre-purchase land verification and double-selling detection in Bangladesh.">
-  
+  <meta name="description" content="BuyerGuard BD — Smart Land Pre-Purchase Verification &amp; Double-Selling Detection Platform in Bangladesh.">
+
   <!-- Bootstrap 5.3 & Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  
+
   <!-- Custom Design System -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   {% block extra_head %}{% endblock %}
@@ -21,7 +21,7 @@
     <div class="container d-flex align-items-center justify-content-center gap-2 flex-wrap">
       <i class="bi bi-shield-exclamation"></i>
       <span><strong>{{ demo_disclaimer }}</strong></span>
-      <span class="badge bg-secondary ms-1">LandTech 2026 Prototype</span>
+      <span class="badge bg-secondary ms-1">LandTech 2026</span>
     </div>
   </div>
 
@@ -31,7 +31,7 @@
       <a class="navbar-brand" href="{{ url_for('index') }}">
         <i class="bi bi-shield-check text-info fs-4"></i>
         <span>BuyerGuard <span class="text-info">BD</span></span>
-        <span class="brand-badge">P5 Verification</span>
+        <span class="brand-badge">{% if current_lang == 'bn' %}P5 যাচাইকরণ{% else %}P5 Verification{% endif %}</span>
       </a>
 
       <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,29 +42,44 @@
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1">
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
-              <i class="bi bi-house me-1"></i> Home
+              <i class="bi bi-house me-1"></i> {{ t('nav_home') }}
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
-              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+              <i class="bi bi-speedometer2 me-1"></i> {{ t('nav_dashboard') }}
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'standalone_checklist' %}active{% endif %}" href="{{ url_for('standalone_checklist') }}">
-              <i class="bi bi-check2-square me-1"></i> Citizen Checklist
+              <i class="bi bi-check2-square me-1"></i> {{ t('nav_checklist') }}
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if request.endpoint == 'haq_shufa_guide' %}active{% endif %}" href="{{ url_for('haq_shufa_guide') }}">
-              <i class="bi bi-book me-1"></i> Haq Shufa Legal Guide
+            <a class="nav-link {% if request.endpoint == 'haq_shufa_guide' %}active{% endif %}" href="{{ url_for('haq_shufa_guide') }}" title="Haq Shufa Legal Guide">
+              <i class="bi bi-book me-1"></i> {{ t('nav_haq_shufa') }} <span class="d-none d-xl-inline small opacity-75">(Haq Shufa Legal Guide)</span>
             </a>
           </li>
+
+          <!-- Language Toggle Button (বাংলা | English) -->
           <li class="nav-item ms-lg-2">
+            <a href="{{ url_for('set_language', lang=other_lang, next=request.full_path) }}"
+               class="btn btn-outline-light btn-sm d-inline-flex align-items-center gap-1 lang-toggle-link"
+               id="lang-toggle-btn"
+               title="Switch language / ভাষা পরিবর্তন করুন">
+              <i class="bi bi-translate text-info"></i>
+              <span class="{% if current_lang == 'bn' %}fw-bold text-warning{% else %}opacity-75{% endif %}">বাংলা</span>
+              <span class="opacity-50">|</span>
+              <span class="{% if current_lang == 'en' %}fw-bold text-warning{% else %}opacity-75{% endif %}">English</span>
+            </a>
+          </li>
+
+          <!-- Quick Search in Navbar -->
+          <li class="nav-item ms-lg-1">
             <form class="d-flex" action="{{ url_for('search') }}" method="GET" role="search">
               <div class="input-group input-group-sm">
-                <input class="form-control" type="search" name="q" placeholder="Plot / Deed / Khatian..." aria-label="Search plot" required>
-                <button class="btn btn-teal" type="submit" id="nav-search-btn">
+                <input class="form-control" type="search" name="q" placeholder="{{ t('nav_search_placeholder') }}" aria-label="{{ t('nav_search_aria') }}" required>
+                <button class="btn btn-teal" type="submit" id="nav-search-btn" title="{{ t('nav_search_btn_title') }}">
                   <i class="bi bi-search"></i>
                 </button>
               </div>
@@ -90,7 +105,7 @@
             <h5 class="text-white mb-0">BuyerGuard BD</h5>
           </div>
           <p class="footer-description small pe-lg-4 mb-3">
-            An explainable LandTech educational prototype designed for the LandTech Innovation Hackathon 2026 at Daffodil International University. Focused on Track P5 (Citizen Pre-Purchase Verification) and P3 (Fraud & Double-Selling Detection).
+            {{ t('footer_tagline') }}
           </p>
           <div class="d-flex flex-wrap gap-2">
             <span class="badge bg-dark border border-secondary text-light">Python 3.11</span>
@@ -101,27 +116,27 @@
         </div>
 
         <div class="col-6 col-lg-3">
-          <h6 class="text-white mb-3">Quick Navigation</h6>
+          <h6 class="text-white mb-3">{{ t('footer_quick_links') }}</h6>
           <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
-            <li><a href="{{ url_for('index') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Home Search</a></li>
-            <li><a href="{{ url_for('dashboard') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Records Dashboard</a></li>
-            <li><a href="{{ url_for('standalone_checklist') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Due Diligence Checklist</a></li>
-            <li><a href="{{ url_for('haq_shufa_guide') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> Haq Shufa Legal Guide</a></li>
-            <li><a href="{{ url_for('health') }}" target="_blank" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> System Health Check</a></li>
+            <li><a href="{{ url_for('index') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> {{ t('nav_home') }}</a></li>
+            <li><a href="{{ url_for('dashboard') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> {{ t('nav_dashboard') }}</a></li>
+            <li><a href="{{ url_for('standalone_checklist') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> {{ t('nav_checklist') }}</a></li>
+            <li><a href="{{ url_for('haq_shufa_guide') }}" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> {{ t('nav_haq_shufa') }} (Haq Shufa Legal Guide)</a></li>
+            <li><a href="{{ url_for('health') }}" target="_blank" class="footer-nav-link"><i class="bi bi-chevron-right me-1 text-info"></i> {{ t('footer_health_check') }}</a></li>
           </ul>
         </div>
 
         <div class="col-6 col-lg-4">
-          <h6 class="text-white mb-3">Responsible Disclaimer</h6>
+          <h6 class="text-white mb-3">{{ t('footer_disclaimer_title') }}</h6>
           <p class="small footer-disclaimer mb-0">
-            This platform is an educational simulation. It does not interface with the Directorate General of Land Records and Surveys (DGLRS), Land Registration portals, or any official government repository. Always obtain certified records and professional legal counsel before entering land transactions.
+            {{ t('footer_disclaimer_text') }}
           </p>
         </div>
       </div>
 
       <div class="border-top border-secondary pt-3 text-center footer-copyright small">
         <p class="mb-0">
-          BuyerGuard BD &copy; {{ current_year }} — LandTech Hackathon 2026 Academic Submission Prototype.
+          {{ t('footer_copyright')|safe }}
         </p>
       </div>
     </div>

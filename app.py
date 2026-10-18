@@ -6,7 +6,7 @@ LandTech Innovation Hackathon 2026 Prototype
 
 import os
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, abort, jsonify
+from flask import Flask, render_template, request, redirect, url_for, abort, jsonify, session, g
 
 from database import (
     init_db,
@@ -18,6 +18,7 @@ from database import (
 from seed_data import seed_database
 from risk_engine import RiskEngine
 from haq_shufa_engine import HaqShufaEngine
+from translations import t, get_checklist_items, get_roadmap_items
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "buyerguard-bd-hackathon-2026-secret")
@@ -31,15 +32,58 @@ with app.app_context():
         seed_database()
 
 
+@app.before_request
+def handle_language():
+    """Detect and persist language preference across requests. Defaults to Bangla ('bn')."""
+    lang_param = request.args.get("lang")
+    if lang_param in ("bn", "en"):
+        session["lang"] = lang_param
+    g.lang = session.get("lang", "bn")
+
+
 @app.context_processor
 def inject_global_data():
-    """Inject common template variables such as current year and demo banner text."""
+    """Inject common template variables and translation helpers."""
+    lang = getattr(g, "lang", session.get("lang", "bn"))
     return {
         "current_year": datetime.now().year,
         "app_name": "BuyerGuard BD",
-        "tagline": "Check Before You Buy",
-        "demo_disclaimer": "DEMO ONLY — All records are synthetic. This application is not connected to official land-record systems.",
+        "current_lang": lang,
+        "other_lang": "en" if lang == "bn" else "bn",
+        "other_lang_name": "English" if lang == "bn" else "বাংলা",
+        "t": lambda key, default=None: t(key, lang, default),
+        "tagline": t("app_tagline", lang),
+        "tagline_short": t("tagline_short", lang),
+        "demo_disclaimer": t("banner_text", lang),
+        "checklist_items": get_checklist_items(lang),
+        "roadmap_items": get_roadmap_items(lang),
     }
+
+
+@app.route("/set-language")
+def set_language():
+    """
+    Toggle or set language preference ('bn' or 'en') and redirect back to
+    the equivalent current page.
+    """
+    lang = request.args.get("lang", "bn")
+    if lang not in ("bn", "en"):
+        lang = "bn"
+    session["lang"] = lang
+
+    next_url = request.args.get("next") or request.referrer or url_for("index")
+    # Clean up any residual lang= query parameter from next_url if present
+    # to avoid overriding subsequent session state
+    if "?" in next_url:
+        parts = next_url.split("?")
+        base_path = parts[0]
+        query_params = [
+            param for param in parts[1].split("&")
+            if not param.startswith("lang=") and param
+        ]
+        next_url = base_path + ("?" + "&".join(query_params) if query_params else "")
+
+    return redirect(next_url)
 
 
 @app.route("/")
@@ -54,6 +98,7 @@ def dashboard():
     Dashboard displaying real statistics computed from the SQLite database
     and the deterministic Risk Engine.
     """
+    lang = getattr(g, "lang", "bn")
     plots = get_all_plots()
     status_filter = request.args.get("status", "").strip()
     mutation_filter = request.args.get("mutation", "").strip()
@@ -67,7 +112,7 @@ def dashboard():
 
     for plot in plots:
         txs = get_transactions_for_plot(plot["plot_id"])
-        assessment = RiskEngine.evaluate_plot(plot, txs)
+        assessment = RiskEngine.evaluate_plot(plot, txs, lang=lang)
         plot_item = {
             "plot": plot,
             "assessment": assessment,
@@ -127,6 +172,7 @@ def search():
     Search plots by Plot ID, Khatian reference, Deed reference, or Mouza code.
     Normalizes input and evaluates all matching results through the risk engine.
     """
+    lang = getattr(g, "lang", "bn")
     query = request.args.get("q", "").strip()
     if not query:
         return redirect(url_for("dashboard"))
@@ -135,7 +181,7 @@ def search():
     results = []
     for plot in raw_results:
         txs = get_transactions_for_plot(plot["plot_id"])
-        assessment = RiskEngine.evaluate_plot(plot, txs)
+        assessment = RiskEngine.evaluate_plot(plot, txs, lang=lang)
         results.append({
             "plot": plot,
             "assessment": assessment,
@@ -156,16 +202,24 @@ def plot_detail(plot_id: str):
     Display comprehensive synthetic plot details, transaction chain,
     completeness breakdown, explainable warnings, and pre-purchase checklist.
     """
+    lang = getattr(g, "lang", "bn")
     plot = get_plot_by_id(plot_id)
     if not plot:
+        is_bn = (lang != "en")
+        res_name = f"প্লট '{plot_id}'" if is_bn else f"Plot '{plot_id}'"
+        msg = (
+            f"'{plot_id}' নম্বরের কোনো প্রদর্শনী রেকর্ড পাওয়া যায়নি (No demonstration record found)। PLOT-1001, PLOT-1002 বা PLOT-1004 দিয়ে অনুসন্ধান করে দেখতে পারেন।"
+            if is_bn else
+            f"No demonstration record found for plot '{plot_id}'. Try searching for PLOT-1001, PLOT-1002, or PLOT-1004."
+        )
         return render_template(
             "404.html",
-            resource_name=f"Plot '{plot_id}'",
-            message=f"No demonstration record found for identifier '{plot_id}'. Try searching PLOT-1001, PLOT-1002, or PLOT-1004.",
+            resource_name=res_name,
+            message=msg,
         ), 404
 
     txs = get_transactions_for_plot(plot["plot_id"])
-    assessment = RiskEngine.evaluate_plot(plot, txs)
+    assessment = RiskEngine.evaluate_plot(plot, txs, lang=lang)
 
     return render_template(
         "plot_detail.html",
@@ -182,12 +236,13 @@ def plot_report(plot_id: str):
     Uses dedicated print CSS, displays synthetic disclaimer, plot details,
     warnings, and checklist status.
     """
+    lang = getattr(g, "lang", "bn")
     plot = get_plot_by_id(plot_id)
     if not plot:
         abort(404)
 
     txs = get_transactions_for_plot(plot["plot_id"])
-    assessment = RiskEngine.evaluate_plot(plot, txs)
+    assessment = RiskEngine.evaluate_plot(plot, txs, lang=lang)
     generated_at = datetime.now().strftime("%B %d, %Y - %I:%M %p")
 
     return render_template(
@@ -216,7 +271,8 @@ def haq_shufa_guide():
     under SAT Act 1950 (s.96), NAT Act 1949 (s.24), and Muslim personal law.
     Supports both interactive client-side and server-side evaluation.
     """
-    scenarios = HaqShufaEngine.get_synthetic_scenarios()
+    lang = getattr(g, "lang", "bn")
+    scenarios = HaqShufaEngine.get_synthetic_scenarios(lang=lang)
     statutes = HaqShufaEngine.VERIFIED_STATUTES
     assessment = None
     form_data = {}
@@ -230,14 +286,14 @@ def haq_shufa_guide():
             "notice_status": request.form.get("notice_status", ""),
             "easement_status": request.form.get("easement_status", ""),
         }
-        assessment = HaqShufaEngine.evaluate(form_data)
+        assessment = HaqShufaEngine.evaluate(form_data, lang=lang)
     elif request.args.get("scenario"):
         # Preload synthetic demonstration scenario
         scenario_id = request.args.get("scenario")
         selected = next((s for s in scenarios if s["id"] == scenario_id), None)
         if selected:
             form_data = selected["data"]
-            assessment = HaqShufaEngine.evaluate(form_data)
+            assessment = HaqShufaEngine.evaluate(form_data, lang=lang)
 
     return render_template(
         "haq_shufa.html",
@@ -254,8 +310,10 @@ def api_haq_shufa_evaluate():
     API endpoint for real-time assessment of Haq Shufa questionnaire inputs.
     Returns JSON evaluation containing informational category, factors, and guidance.
     """
+    lang = getattr(g, "lang", "bn")
     data = request.get_json(silent=True) or request.form.to_dict()
-    result = HaqShufaEngine.evaluate(data)
+    eval_lang = data.get("lang") or lang
+    result = HaqShufaEngine.evaluate(data, lang=eval_lang)
     return jsonify(result), 200
 
 
@@ -281,20 +339,32 @@ def health():
 @app.errorhandler(404)
 def not_found_error(error):
     """Graceful 404 handler."""
+    lang = getattr(g, "lang", session.get("lang", "bn"))
+    is_bn = (lang != "en")
     return render_template(
         "404.html",
-        resource_name="Requested Page",
-        message="The page or synthetic land record you requested could not be located in the demonstration system.",
+        resource_name="অনুরোধকৃত পৃষ্ঠা পাওয়া যায়নি (Requested Page Not Found)" if is_bn else "Requested Page or Record Not Found",
+        message=(
+            "আপনার অনুরোধকৃত পৃষ্ঠা বা কাল্পনিক জমির রেকর্ডটি এই ডেমো সিস্টেমে খুঁজে পাওয়া যায়নি। অনুগ্রহ করে ড্যাশবোর্ডে ফিরে যান।"
+            if is_bn else
+            "The requested synthetic plot or page could not be located in the demonstration database. Please return to the dashboard."
+        ),
     ), 404
 
 
 @app.errorhandler(500)
 def internal_error(error):
     """Graceful 500 handler without leaking internal tracebacks."""
+    lang = getattr(g, "lang", session.get("lang", "bn"))
+    is_bn = (lang != "en")
     return render_template(
         "404.html",
-        resource_name="System Error",
-        message="An unexpected condition occurred within the demonstration application. Please return to the dashboard.",
+        resource_name="সিস্টেম ত্রুটি (System Error)" if is_bn else "Internal System Error",
+        message=(
+            "অ্যাপ্লিকেশনটিতে একটি অপ্রত্যাশিত সমস্যা দেখা দিয়েছে। অনুগ্রহ করে ড্যাশবোর্ডে ফিরে যান।"
+            if is_bn else
+            "An unexpected error occurred. Please try again later or return to the main dashboard."
+        ),
     ), 500
 
 

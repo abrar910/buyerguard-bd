@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}BuyerGuard BD — Smart Land Pre-Purchase Verification Platform{% endblock %}
+{% block title %}{% if current_lang == 'bn' %}{{ app_name }} — জমি কেনার আগেই যাচাই করুন (Check Before You Buy){% else %}{{ app_name }} — Check Before You Buy Land{% endif %}{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -9,60 +9,72 @@
     <div class="row justify-content-center">
       <div class="col-lg-9 col-xl-8">
         <span class="badge bg-teal-subtle text-info border border-info mb-3 px-3 py-2 rounded-pill fw-medium">
-          <i class="bi bi-shield-check me-1"></i> Track P5: Citizen Pre-Purchase Verification &amp; P3 Fraud Detection
+          <i class="bi bi-shield-check me-1"></i>
+          {% if current_lang == 'bn' %}
+            ট্র্যাক P5: নাগরিক প্রাক-ক্রয় যাচাইকরণ ও ট্র্যাক P3: দ্বৈত-বিক্রয় ঝুঁকি শনাক্তকরণ
+          {% else %}
+            Track P5: Citizen Pre-Purchase Verification &bull; Track P3: Fraud &amp; Double-Selling Detection
+          {% endif %}
         </span>
         <h1 class="hero-title mb-3">
-          Check Before You Buy.
+          {{ t('hero_title') }}
         </h1>
         <p class="hero-subtitle mb-4">
-          A centralized, explainable demonstration tool helping prospective land buyers in Bangladesh identify missing deed records, mutation gaps, unverified claims, and simulated duplicate-sale conflicts before purchasing.
+          {{ t('hero_subtitle') }}
         </p>
 
         <!-- Search Bar -->
         <div class="card p-3 p-md-4 shadow-lg border-0 rounded-4 bg-white text-start mb-4">
           <form action="{{ url_for('search') }}" method="GET">
             <label for="hero-search-input" class="form-label text-secondary small fw-semibold">
-              Search Synthetic Land Records by Plot ID, Khatian, Deed, or Mouza:
+              {{ t('hero_search_label') }}
             </label>
             <div class="input-group input-group-lg">
               <span class="input-group-text bg-light border-end-0 text-muted">
                 <i class="bi bi-search"></i>
               </span>
-              <input type="text" id="hero-search-input" name="q" class="form-control border-start-0" 
-                     placeholder="e.g., PLOT-1001, KH-DEMO-1004, DEED-DEMO-1002, or DEMO-MOUZA-01" required>
+              <input type="text" id="hero-search-input" name="q" class="form-control border-start-0"
+                     placeholder="{{ t('hero_search_placeholder') }}" required>
               <button class="btn btn-teal px-4 fw-semibold" type="submit" id="hero-submit-btn">
-                Verify Record <i class="bi bi-arrow-right ms-1"></i>
+                {{ t('hero_search_btn') }} <i class="bi bi-arrow-right ms-1"></i>
               </button>
             </div>
           </form>
 
           <!-- Quick Test Scenarios -->
           <div class="mt-3 pt-2 border-top border-light d-flex flex-wrap align-items-center gap-2">
-            <span class="small text-muted fw-medium me-1">Try Demonstration Cases:</span>
+            <span class="small text-muted fw-medium me-1">{{ t('hero_demo_cases_label') }}</span>
             <a href="{{ url_for('plot_detail', plot_id='PLOT-1001') }}" class="demo-pill bg-light text-dark border">
-              <i class="bi bi-check-circle-fill text-success"></i> PLOT-1001 (Clean Title)
+              <i class="bi bi-check-circle-fill text-success"></i>
+              {% if current_lang == 'bn' %}PLOT-1001 (সতর্কতাহীন ডেমো / No Demo Warnings){% else %}PLOT-1001 (No Demo Warnings){% endif %}
             </a>
             <a href="{{ url_for('plot_detail', plot_id='PLOT-1004') }}" class="demo-pill bg-light text-dark border">
-              <i class="bi bi-exclamation-triangle-fill text-danger"></i> PLOT-1004 (Duplicate-Sale Conflict)
+              <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+              {% if current_lang == 'bn' %}PLOT-1004 (দ্বৈত-বিক্রয়ের বিরোধ / Double Sale){% else %}PLOT-1004 (Double Sale Conflict){% endif %}
             </a>
             <a href="{{ url_for('plot_detail', plot_id='PLOT-1002') }}" class="demo-pill bg-light text-dark border">
-              <i class="bi bi-file-earmark-x text-warning"></i> PLOT-1002 (Missing Mutation)
+              <i class="bi bi-file-earmark-x text-warning"></i>
+              {% if current_lang == 'bn' %}PLOT-1002 (নামজারি অনুপস্থিত / Missing Mutation){% else %}PLOT-1002 (Missing Mutation){% endif %}
             </a>
             <a href="{{ url_for('plot_detail', plot_id='PLOT-1005') }}" class="demo-pill bg-light text-dark border">
-              <i class="bi bi-arrow-left-right text-info"></i> PLOT-1005 (Deed Mismatch)
+              <i class="bi bi-arrow-left-right text-info"></i>
+              {% if current_lang == 'bn' %}PLOT-1005 (দলিল নম্বরে অমিল / Deed Mismatch){% else %}PLOT-1005 (Deed Reference Mismatch){% endif %}
             </a>
             <a href="{{ url_for('plot_detail', plot_id='PLOT-1008') }}" class="demo-pill bg-light text-dark border">
-              <i class="bi bi-shield-slash text-danger"></i> PLOT-1008 (Multi-Warning)
+              <i class="bi bi-shield-slash text-danger"></i>
+              {% if current_lang == 'bn' %}PLOT-1008 (একাধিক সতর্কতা / Multi-Warning){% else %}PLOT-1008 (Multiple Warnings){% endif %}
             </a>
           </div>
         </div>
 
         <div class="d-flex justify-content-center gap-3">
           <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light px-4 py-2">
-            <i class="bi bi-grid-3x3-gap me-2"></i> Browse All 22 Demo Records
+            <i class="bi bi-grid-3x3-gap me-2"></i>
+            {% if current_lang == 'bn' %}সকল ২২টি ডেমো রেকর্ড দেখুন{% else %}View All 22 Demo Records{% endif %}
           </a>
           <a href="{{ url_for('standalone_checklist') }}" class="btn btn-outline-info px-4 py-2">
-            <i class="bi bi-list-check me-2"></i> Pre-Purchase Checklist
+            <i class="bi bi-list-check me-2"></i>
+            {% if current_lang == 'bn' %}প্রাক-ক্রয় চেকলিস্ট{% else %}Citizen Checklist{% endif %}
           </a>
         </div>
       </div>
@@ -74,10 +86,14 @@
 <section class="py-5 bg-white border-bottom">
   <div class="container py-3">
     <div class="text-center max-w-700 mx-auto mb-5">
-      <span class="text-teal text-uppercase fw-bold small tracking-wide" style="color: var(--brand-teal-600);">Key Capabilities</span>
-      <h2 class="fw-bold mt-1 text-navy" style="color: var(--brand-navy-900);">Why Pre-Purchase Verification Matters</h2>
+      <span class="text-teal text-uppercase fw-bold small tracking-wide" style="color: var(--brand-teal-600);">
+        {% if current_lang == 'bn' %}প্রধান সুবিধাসমূহ{% else %}Core Capabilities{% endif %}
+      </span>
+      <h2 class="fw-bold mt-1 text-navy" style="color: var(--brand-navy-900);">
+        {{ t('why_verify_title') }}
+      </h2>
       <p class="text-muted">
-        In Bangladesh, land records are bifurcated between Sub-Registry deed archives and AC (Land) revenue ledgers. BuyerGuard BD organizes these simulated layers into an explainable verification snapshot.
+        {{ t('why_verify_subtitle') }}
       </p>
     </div>
 
@@ -87,9 +103,9 @@
           <div class="stat-icon primary mb-3">
             <i class="bi bi-journal-check"></i>
           </div>
-          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">Deed &amp; Mutation Cross-Check</h5>
+          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">{{ t('card_dglrs_title') }}</h5>
           <p class="text-muted small mb-0">
-            Organizes registered deed references alongside mutation (namjari) records to ensure current ownership claims match recorded revenue entries.
+            {{ t('card_dglrs_desc') }}
           </p>
         </div>
       </div>
@@ -99,9 +115,15 @@
           <div class="stat-icon danger mb-3">
             <i class="bi bi-shield-shaded"></i>
           </div>
-          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">Double-Selling Simulator</h5>
+          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">
+            {% if current_lang == 'bn' %}দ্বৈত-বিক্রয় ঝুঁকি নিরোধক{% else %}Double-Selling Detection{% endif %}
+          </h5>
           <p class="text-muted small mb-0">
-            Identifies simulated conflicts where multiple active sale claims or parallel deed conveyances exist for the same plot.
+            {% if current_lang == 'bn' %}
+              একই জমির বিপরীতে একাধিক সক্রিয় বিক্রয় দাবি বা সমান্তরাল দলিলের উপস্থিতি থাকলে তা তাৎক্ষণিকভাবে বিরোধ হিসেবে শনাক্ত করে।
+            {% else %}
+              Detects parallel active conveyance claims or conflicting deeds citing the same parcel across historical conveyance logs.
+            {% endif %}
           </p>
         </div>
       </div>
@@ -111,9 +133,15 @@
           <div class="stat-icon warning mb-3">
             <i class="bi bi-percent"></i>
           </div>
-          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">Completeness Scoring</h5>
+          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">
+            {% if current_lang == 'bn' %}তথ্য পূর্ণাঙ্গতা সূচক{% else %}Completeness Scoring{% endif %}
+          </h5>
           <p class="text-muted small mb-0">
-            Detects unrecorded fields such as unverified litigation or missing khas acquisition notices, preventing false assumptions of safety.
+            {% if current_lang == 'bn' %}
+              অসম্পূর্ণ দলিল, অনির্ধারিত মামলা বা অপ্রাপ্ত খাস/অধিগ্রহণ তথ্যের ঘাটতি পরিমাপ করে, যাতে তথ্যের অনুপস্থিতিকে ভুলেও নিরাপদ মনে না করা হয়।
+            {% else %}
+              Measures the presence of fundamental diligence fields so missing mutation or court data is never mistaken for title security.
+            {% endif %}
           </p>
         </div>
       </div>
@@ -123,9 +151,15 @@
           <div class="stat-icon teal mb-3">
             <i class="bi bi-printer"></i>
           </div>
-          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">Printable Due Diligence</h5>
+          <h5 class="fw-bold text-navy" style="color: var(--brand-navy-800);">
+            {% if current_lang == 'bn' %}প্রিন্টযোগ্য যাচাই প্রতিবেদন{% else %}Printable Due Diligence Reports{% endif %}
+          </h5>
           <p class="text-muted small mb-0">
-            Generates a printable summary report paired with an interactive 7-point due diligence checklist for buyers to take to their legal counsel.
+            {% if current_lang == 'bn' %}
+              নাগরিকদের জন্য প্রিন্টযোগ্য সারসংক্ষেপ রিপোর্ট এবং আইনজীবীর নিকট আলোচনার জন্য ৭-দফা বাস্তবসম্মত যাচাইকরণ চেকলিস্ট তৈরি করে।
+            {% else %}
+              Generates formal print-ready summary dossiers complete with signature lines and a 7-point diligence checklist for legal counsel.
+            {% endif %}
           </p>
         </div>
       </div>
@@ -138,70 +172,92 @@
   <div class="container py-2">
     <div class="row align-items-center g-5">
       <div class="col-lg-6">
-        <span class="badge bg-primary-subtle text-primary mb-2 fw-semibold">The Bangladesh Context</span>
-        <h3 class="fw-bold text-navy mb-3" style="color: var(--brand-navy-900);">Navigating Multiple Land Documents</h3>
+        <span class="badge bg-primary-subtle text-primary mb-2 fw-semibold">
+          {% if current_lang == 'bn' %}বাংলাদেশের প্রেক্ষাপট{% else %}Bangladesh Regulatory Context{% endif %}
+        </span>
+        <h3 class="fw-bold text-navy mb-3" style="color: var(--brand-navy-900);">
+          {% if current_lang == 'bn' %}ভূমি ক্রয়ে একাধিক দপ্তরের নথিপত্র পর্যালোচনা{% else %}Pre-Purchase Investigation Across Multiple Authorities{% endif %}
+        </h3>
         <p class="text-secondary">
-          Purchasing immovable property in Bangladesh requires reviewing disparate records across multiple offices:
+          {% if current_lang == 'bn' %}
+            বাংলাদেশে স্থাবর সম্পত্তি ক্রয়ের ক্ষেত্রে বিভিন্ন অফিসের সংরক্ষিত রেকর্ড পুঙ্খানুপুঙ্খভাবে যাচাই করা অপরিহার্য:
+          {% else %}
+            Navigating property conveyances in Bangladesh requires cross-examining documents maintained by separate government agencies:
+          {% endif %}
         </p>
         <ul class="list-unstyled d-flex flex-column gap-3 mb-4">
           <li class="d-flex align-items-start gap-3">
             <i class="bi bi-1-circle-fill text-primary fs-5 mt-1"></i>
             <div>
-              <strong>Original Title Deeds (Dalil):</strong>
-              <p class="text-muted small mb-0">Registered at the Sub-Registry office establishing transfer of title.</p>
+              <strong>{% if current_lang == 'bn' %}মূল মালিকানা দলিল (Title Deeds / Dalil):{% else %}Registered Title Deeds (Dalil):{% endif %}</strong>
+              <p class="text-muted small mb-0">
+                {% if current_lang == 'bn' %}সাব-রেজিস্ট্রি অফিসে নিবন্ধিত দলিল যা স্বত্ব হস্তান্তরের মূল আইনি ভিত্তি।{% else %}Registered at the Sub-Registry office, serving as the foundational instrument of ownership transfer.{% endif %}
+              </p>
             </div>
           </li>
           <li class="d-flex align-items-start gap-3">
             <i class="bi bi-2-circle-fill text-primary fs-5 mt-1"></i>
             <div>
-              <strong>Mutation Khatian (Namjari Porcha) &amp; DCR:</strong>
-              <p class="text-muted small mb-0">Recorded at the Assistant Commissioner (Land) office updating the revenue record.</p>
+              <strong>{% if current_lang == 'bn' %}নামজারি খতিয়ান (ই-নামজারি) ও ডিসিআর:{% else %}Mutation Khatian (Namjari) &amp; DCR:{% endif %}</strong>
+              <p class="text-muted small mb-0">
+                {% if current_lang == 'bn' %}সহকারী কমিশনার (ভূমি) অফিসে রক্ষিত রাজস্ব রেকর্ড যা খাজনা আদায়ে নামপত্তন নিশ্চিত করে।{% else %}Maintained by the AC (Land) office to assess land development tax and register the owner's legal holding.{% endif %}
+              </p>
             </div>
           </li>
           <li class="d-flex align-items-start gap-3">
             <i class="bi bi-3-circle-fill text-primary fs-5 mt-1"></i>
             <div>
-              <strong>Historical Survey Records (CS, SA, RS, City/BS):</strong>
-              <p class="text-muted small mb-0">Verifying continuity of possession and chain of title across generations.</p>
+              <strong>{% if current_lang == 'bn' %}ধারাবাহিক জরিপ খতিয়ান (CS, SA, RS, City/BS):{% else %}Chain of Title Survey Porchas (CS, SA, RS, BS):{% endif %}</strong>
+              <p class="text-muted small mb-0">
+                {% if current_lang == 'bn' %}বিগত কয়েক প্রজন্মের সরকারি জরিপের মাধ্যমে স্বত্বের নিরবচ্ছিন্ন ধারাবাহিকতা (Chain of Title) যাচাই।{% else %}Tracing the chronological devolution of title across historic cadastral surveys without missing links.{% endif %}
+              </p>
             </div>
           </li>
           <li class="d-flex align-items-start gap-3">
             <i class="bi bi-4-circle-fill text-primary fs-5 mt-1"></i>
             <div>
-              <strong>Physical Possession &amp; Boundary Demarcation (Chouhaddi):</strong>
-              <p class="text-muted small mb-0">Ground inspection to verify that the physical boundaries match the paper records.</p>
+              <strong>{% if current_lang == 'bn' %}সরেজমিন দখল ও সীমানা পরিমাপ (Chouhaddi):{% else %}Physical Possession &amp; Boundaries (Chouhaddi):{% endif %}</strong>
+              <p class="text-muted small mb-0">
+                {% if current_lang == 'bn' %}মৌজা নকশার সাথে মাঠপর্যায়ে জমির দখল ও চতুর্দিকের চৌহদ্দি সীমানা ঠিক আছে কি না তা যাচাই।{% else %}Verifying demarcated physical boundaries against cadastral mouza maps and confirming undisputed possession.{% endif %}
+              </p>
             </div>
           </li>
         </ul>
         <a href="{{ url_for('standalone_checklist') }}" class="btn btn-primary-custom">
-          <i class="bi bi-clipboard2-check me-2"></i> View Interactive Pre-Purchase Checklist
+          <i class="bi bi-clipboard2-check me-2"></i>
+          {% if current_lang == 'bn' %}নাগরিক প্রাক-ক্রয় চেকলিস্ট দেখুন{% else %}Open Citizen Diligence Checklist{% endif %}
         </a>
       </div>
 
       <div class="col-lg-6">
         <div class="card shadow-sm border-0 p-4 rounded-4 bg-white">
           <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
-            <span class="fw-bold text-navy"><i class="bi bi-cpu text-info me-2"></i> Explainable Rule Engine</span>
+            <span class="fw-bold text-navy"><i class="bi bi-cpu text-info me-2"></i> {{ t('rules_overview_title') }}</span>
             <span class="badge bg-success-subtle text-success">Deterministic Python Logic</span>
           </div>
           <div class="small text-muted mb-3">
-            Unlike opaque black-box models, BuyerGuard BD evaluates every plot against 5 deterministic, verifiable rules:
+            {{ t('rules_overview_subtitle') }}
           </div>
           <div class="d-flex flex-column gap-2">
             <div class="p-2 rounded bg-light border-start border-3 border-danger">
-              <span class="fw-semibold text-danger">Rule 1 (RULE_DUP_SALE):</span> Multiple active sale claims with conflicting deeds.
+              <span class="fw-semibold text-danger">RULE_DUP_SALE:</span>
+              {% if current_lang == 'bn' %}একাধিক সক্রিয় বিক্রয় চুক্তি ও পরস্পরবিরোধী দলিলের সংঘাত।{% else %}Concurrent conflicting active transactions citing different deed references.{% endif %}
             </div>
             <div class="p-2 rounded bg-light border-start border-3 border-warning">
-              <span class="fw-semibold text-warning">Rule 2 (RULE_INCOMPLETE_RECORD):</span> Missing essential deed, mutation, or khatian fields.
+              <span class="fw-semibold text-warning">RULE_INCOMPLETE_RECORD:</span>
+              {% if current_lang == 'bn' %}প্রয়োজনীয় দলিল, নামজারি বা খতিয়ানের তথ্যের ঘাটতি।{% else %}Missing essential mutation khatian, registered deed, or plot identifiers.{% endif %}
             </div>
             <div class="p-2 rounded bg-light border-start border-3 border-warning">
-              <span class="fw-semibold text-warning">Rule 3 (RULE_REF_MISMATCH):</span> Plot master deed conflicts with transaction registry.
+              <span class="fw-semibold text-warning">RULE_REF_MISMATCH:</span>
+              {% if current_lang == 'bn' %}প্লট রেকর্ডের সাথে ট্রানজ্যাকশন দলিলের নম্বরের অমিল বা গরমিল।{% else %}Contradiction between master plot deed and active conveyance deeds.{% endif %}
             </div>
             <div class="p-2 rounded bg-light border-start border-3 border-info">
-              <span class="fw-semibold text-info">Rule 4 (RULE_UNKNOWN_CASE):</span> Litigation status unrecorded in demo dataset.
+              <span class="fw-semibold text-info">RULE_UNKNOWN_CASE:</span>
+              {% if current_lang == 'bn' %}আদালতে কোনো মামলা বিচারাধীন আছে কি না তা ডেমো রেকর্ডে অপ্রাপ্ত।{% else %}Unrecorded court litigation or civil injunction status.{% endif %}
             </div>
             <div class="p-2 rounded bg-light border-start border-3 border-info">
-              <span class="fw-semibold text-info">Rule 5 (RULE_UNKNOWN_KHAS):</span> Khas / Government acquisition status unrecorded.
+              <span class="fw-semibold text-info">RULE_UNKNOWN_KHAS:</span>
+              {% if current_lang == 'bn' %}সরকারি খাস বা ভূমি অধিগ্রহণ নোটিশের অবস্থা অপ্রাপ্ত।{% else %}Unverified government Khas, Vested, or acquisition gazette status.{% endif %}
             </div>
           </div>
         </div>

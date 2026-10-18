@@ -1,214 +1,280 @@
 # BuyerGuard BD — Smart Land Pre-Purchase Verification Platform
-> **Tagline:** *Check Before You Buy.*  
-> **Track:** Track P5 — Citizen Pre-Purchase Verification (Related: Track P3 — Fraud & Double-Selling Detection)  
-> **Prepared for:** LandTech Innovation Hackathon 2026, Daffodil International University (DIU), Bangladesh  
+> **ট্যাগলাইন:** *জমি কেনার আগেই যাচাই করুন — স্মার্ট ল্যান্ড প্রি-পারচেজ ভেরিফিকেশন প্ল্যাটফর্ম (Check Before You Buy)*
+> **ট্র্যাক:** Track P5 — Citizen Pre-Purchase Verification (Related: Track P3 — Fraud & Double-Selling Prevention)
+> **ইভেন্ট:** LandTech Innovation Hackathon 2026, Daffodil International University (DIU), Bangladesh
+> **ভাষা ব্যবস্থা:** ডিফল্ট ভাষা বাংলা (Bangla Default) এবং সার্বিক ওয়ান-ক্লিক ইংরেজি টগল (`বাংলা | English`)
 
 ---
 
-## 1. Executive Summary & Problem Context
+## ১. নির্বাহী সারসংক্ষেপ ও প্রেক্ষাপট (Problem Context in Bangladesh)
 
-In Bangladesh, land transactions are notoriously complex and vulnerable to fraudulent conveyances. Citizens face an administrative divide:
-- **Registration Directorate (Sub-Registry):** Registers deeds (*Dalil*) under the Registration Act, 1908.
-- **Ministry of Land (AC Land / Tahsil):** Maintains mutation khatians (*Namjari*), Duplicate Carbon Receipts (*DCR*), and land tax receipts (*Dakhila*) under the State Acquisition and Tenancy Act, 1950.
+বাংলাদেশে জমি ক্রয়-বিক্রয় প্রক্রিয়ায় সাধারণ ক্রেতা ও নাগরিকরা প্রতিনিয়ত জটিলতা ও প্রতারণার সম্মুখীন হন। এর মূল কারণ বাংলাদেশের ভূমিসংক্রান্ত প্রশাসনিক বিভাজন:
+- **নিবন্ধন পরিদপ্তর (সাব-রেজিস্ট্রি অফিস):** *Registration Act, 1908* অনুযায়ী হস্তান্তর দলিল রেজিস্ট্রি করে।
+- **ভূমি মন্ত্রণালয় (সহকারী কমিশনার - ভূমি / ইউনিয়ন ভূমি অফিস):** *State Acquisition and Tenancy Act, 1950* অনুযায়ী নামজারি খতিয়ান (*Namjari*), ডিসিআর (*DCR*), এবং ভূমি উন্নয়ন কর দাখিলা (*Dakhila*) সংরক্ষণ করে।
 
-Because these databases have historically been siloed, prospective buyers struggle to verify:
-1. Whether multiple active deeds have been executed for the same plot (**Double-Selling / Fraud**).
-2. Whether the seller's mutation (*Namjari*) is officially recorded.
-3. Whether the historical chain of title (*Bia Dalil*) is continuous through historical surveys (CS, SA, RS, BS).
-4. Whether the plot has undisclosed civil court injunctions or government *Khas* / acquisition notices.
+এই দুই প্রশাসনিক ব্যবস্থার ডাটাবেজ পরস্পর পুরোপুরি সংযুক্ত না থাকায় সাধারণ নাগরিকরা জমি ক্রয়ের পূর্বে কয়েকটি জরুরি প্রশ্নের উত্তর নিশ্চিত করতে পারেন না:
+1. একই জমির ওপর একাধিক সক্রিয় রেজিস্ট্রিকৃত দলিল রয়েছে কি না (**দ্বৈত-বিক্রয় / জালিয়াতি / Double-Selling**)।
+2. বিক্রেতার নামে নামজারি খতিয়ান হালনাগাদ ও যথাযথ আছে কি না।
+3. সিএস (CS), এসএ (SA), আরএস (RS), এবং বিএস (BS) জরিপের ঐতিহাসিক মালিকানা ধারাবাহিকতা বা বায়া দলিল ঠিক আছে কি না।
+4. সম্পত্তিটিতে দেওয়ানি আদালতে কোনো নিষেধাজ্ঞা, খাস বা অর্পিত সম্পত্তি কিংবা অগ্রক্রয়াধিকারের (**হক শুফা / Right of Pre-emption**) মোকদ্দমার ঝুঁকি আছে কি না।
 
-**BuyerGuard BD** is an explainable, citizen-facing pre-purchase verification platform prototype. It organizes synthetic land plot records, cross-references deed and mutation status, applies deterministic Python rules to detect simulated anomalies (including duplicate-sale conflicts), guides users with an interactive 7-point due diligence checklist, and generates printable summary reports.
-
----
-
-## 2. Implemented Features
-
-- **Dynamic Records Dashboard (`/dashboard`):** Real-time statistics derived directly from SQLite and the deterministic rule engine (Total demo plots, review-required flags, duplicate-sale conflicts, and incomplete records).
-- **Multi-Criteria Search (`/search`):** Query synthetic plots by Plot ID (`PLOT-1004`), Khatian reference (`KH-DEMO-1001`), Deed reference (`DEED-DEMO-1002`), or Mouza code (`DEMO-MOUZA-01`) with clear not-found guidance.
-- **Explainable Anomaly & Risk Detection Engine (`risk_engine.py`):**
-  - `RULE_DUP_SALE`: Detects simulated duplicate-sale conflicts where multiple active transactions have differing deed claims.
-  - `RULE_INCOMPLETE_RECORD`: Highlights missing mutation status, deed reference, or khatian numbers.
-  - `RULE_REF_MISMATCH`: Identifies discrepancies between the plot master record and active transfer deed numbers.
-  - `RULE_UNKNOWN_CASE`: Advises citizens when litigation status is unrecorded in demo data.
-  - `RULE_UNKNOWN_KHAS`: Flags unverified Khas or government acquisition status.
-- **Completeness Index:** Quantitative scoring percentage (e.g. 100%, 78%, 56%) calculating the presence of essential diligence fields so missing data is never mistaken for safety.
-- **Interactive Citizen Pre-Purchase Checklist (`/checklist` & on plot details):** A 7-point diligence tracker persisted in `localStorage` covering Sub-Registry checks, e-Namjari porcha, historical Bia deeds, partition deeds (*Bontonnama*), civil court checks, khas vetting, and advocate review.
-- **Printable Due Diligence Summary Report (`/plots/<plot_id>/report`):** Formal print-ready document (`@media print`) complete with metadata, explainable warnings, and signature blocks for prospective buyers and legal counsel.
-- **Deterministic Synthetic Seed Data (`seed_data.py`):** 22 structured fictional demonstration plots and transaction chains reflecting realistic Bangladesh scenarios.
-- **Health Check Endpoint (`/health`):** JSON endpoint verifying active SQLite connection and plot count.
-- **100% Automated Test Suite:** 24 unit and integration tests passing with `pytest`.
+**BuyerGuard BD** একটি ব্যাখ্যামূলক, নাগরিকবান্ধব প্রাক-ক্রয় জমি যাচাইকরণ প্ল্যাটফর্ম প্রোটোটাইপ। এটি কাল্পনিক ও নিয়ন্ত্রিত ভূমির ডেটা বিশ্লেষণ করে, রেজিস্ট্রি দলিল ও নামজারির তথ্য মেলবন্ধন করে এবং পাইথনের ডিটারমিনিস্টিক রুল ইঞ্জিনের মাধ্যমে সম্ভাব্য ঝুঁকি বা অসঙ্গতি সাধারণ নাগরিকের বোধগম্য ভাষায় তুলে ধরে।
 
 ---
 
-## 3. Technology Stack
+## ২. বর্তমান বাস্তবায়িত সুবিধাসমূহ (Implemented Features)
 
-- **Backend:** Python 3.11, Flask 3.1, Jinja2 Templates.
-- **Database:** SQLite3 (standard Python library) with foreign key constraints, indexes, and parameterized queries.
-- **Logic Engine:** Deterministic, rule-based Python module (`risk_engine.py`).
-- **Frontend:** HTML5, CSS3 (custom navy/teal design system + print stylesheet), Bootstrap 5.3, Bootstrap Icons, Vanilla JavaScript.
-- **Testing:** `pytest` (24 test cases covering routes, rules, and disclaimers).
-- **Environment & Package Management:** `uv` by Astral (self-contained, reproducible virtual environment).
+1. **সম্পূর্ণ দ্বিভাষিক ইন্টারফেস ও ওয়ান-ক্লিক ল্যাঙ্গুয়েজ টগল (Bangla Default with English Toggle):**
+   - প্ল্যাটফর্মের ডিফল্ট ভাষা বাংলা (`bn`)।
+   - মূল নেভিগেশন বারে একটি দৃশ্যমান ও ব্যবহারকারী-বান্ধব টগল বাটন (`বাংলা | English`) সংযুক্ত।
+   - এক ক্লিকেই ব্যবহারকারী বর্তমান পেজেই অবস্থান করে সম্পূর্ণ ইন্টারফেসটি পরিষ্কার ইংরেজিতে দেখতে পারেন এবং পুনরায় ক্লিক করে বাংলায় ফিরে আসতে পারেন।
+   - সেশন ও কুকির মাধ্যমে ব্যবহারকারীর নির্বাচিত ভাষা ব্রাউজারের রিফ্রেশ ও একাধিক পেজ পরিবর্তনের পরেও নিরবচ্ছিন্নভাবে সংরক্ষিত থাকে।
+   - হোম পেজ, ড্যাশবোর্ড, প্লট ডিটেইল, সার্চ রেজাল্ট, এরর পেজ, চেকলিস্ট, হক শুফা গাইড এবং প্রিন্ট রিপোর্ট সহ প্রতিটি পেজ ও ডাইনামিক মেসেজ সম্পূর্ণ দ্বিভাষিক।
 
-*Zero External Dependency Requirements:* Requires no paid API keys, no Google Maps API keys, no Hugging Face API keys, and no live government credentials. Runs entirely locally and offline.
+2. **ডাইনামিক রেকর্ড ড্যাশবোর্ড (`/dashboard`):**
+   - SQLite ডাটাবেজ এবং রুল ইঞ্জিন থেকে সরাসরি পরিগণিত বাস্তব পরিসংখ্যান (মোট ডেমো প্লট, পর্যালোচনা প্রয়োজন, দ্বৈত-বিক্রয় বিরোধ এবং অসম্পূর্ণ রেকর্ড)।
+   - প্লট তালিকা, তাৎক্ষণিক ফিল্টারিং এবং প্রতিক্রিয়াশীল ডেটা ভিউ।
 
----
+3. **বহুমাত্রিক অনুসন্ধান সুবিধা (`/search`):**
+   - প্লট আইডি (`PLOT-1001`), খতিয়ান নম্বর (`KH-DEMO-1004`), দলিল নম্বর (`DEED-DEMO-1002`), বা মৌজা কোড (`DEMO-MOUZA-01`) দিয়ে অনুসন্ধান।
+   - কোনো রেকর্ড না মিললে নির্বাচিত ভাষায় ব্যবহারকারীকে সঠিক বিকল্প ডেমো প্লটের প্রস্তাবনা প্রদর্শন।
 
-## 4. SQLite Database Architecture
+4. **ব্যাখ্যামূলক ঝুঁকি ও অসঙ্গতি নিরোধক ইঞ্জিন (`risk_engine.py`):**
+   - **`RULE_DUP_SALE` (দ্বৈত-বিক্রয়ের অসঙ্গতি):** একই প্লটে ভিন্ন দলিলের একাধিক সক্রিয় লেনদেন দাবি চিহ্নিত করে (High Severity)।
+   - **`RULE_INCOMPLETE_RECORD` (অসম্পূর্ণ রেকর্ড):** অনুপস্থিত নামজারি, দলিল বা খতিয়ান তথ্য সতর্কবার্তা দেয়।
+   - **`RULE_REF_MISMATCH` (রেফারেন্স গরমিল):** মূল মাস্টার দলিলের সাথে লেনদেন রেকর্ডের অসঙ্গতি চিহ্নিত করে।
+   - **`RULE_UNKNOWN_CASE` (অনিশ্চিত মামলা তথ্য):** ডেমো রেকর্ডে আদালতের মামলা যাচাই না থাকলে সতর্কতা জানায়।
+   - **`RULE_UNKNOWN_KHAS` (অনিশ্চিত খাস/অধিগ্রহণ অবস্থা):** খাস বা সরকারি অধিগ্রহণ স্ট্যাটাস যাচাইয়ের নির্দেশনা দেয়।
+   - কোনো পেজেই "Clean Title" বা আইনগত মালিকানার নিশ্চয়তা দাবি করা হয় না; বরং সতর্কতাহীন প্লটের ক্ষেত্রে নিরাপদ পরিভাষা যেমন "ডেমো ডেটায় কোনো সতর্কতামূলক নির্দেশক সনাক্ত হয়নি" / "No Warning Indicators Detected in Demo Data" ব্যবহার করা হয়।
 
-The application uses an embedded SQLite database (`buyerguard.db`) initialized automatically on startup:
+5. **সম্পূর্ণতা সূচক (Completeness Index):**
+   - রেকর্ডের মৌলিক উপাদানের উপস্থিতির ওপর ভিত্তি করে শতকরা হার নির্ধারণ করে, যাতে তথ্যের অনুপস্থিতিকে নাগরিকরা "নিরাপদ জমি" বলে ভুল না করেন।
 
-### `plots` Table
-- `id` (INTEGER PRIMARY KEY AUTOINCREMENT)
-- `plot_id` (TEXT UNIQUE NOT NULL) — Fictional identifier (e.g. `PLOT-1001`)
-- `demo_district` (TEXT NOT NULL) — Administrative division (e.g. "Demo District A")
-- `demo_upazila` (TEXT NOT NULL) — Upazila division (e.g. "Demo Upazila 01")
-- `demo_mouza_code` (TEXT NOT NULL) — Mouza designation (e.g. "DEMO-MOUZA-01")
-- `khatian_ref` (TEXT) — Khatian reference (e.g. `KH-DEMO-1001`)
-- `deed_ref` (TEXT) — Primary registered title deed reference
-- `mutation_status` (TEXT) — "Mutated", "Missing", "Pending", etc.
-- `case_info_status` (TEXT) — Litigation verification status
-- `khas_acquisition_status` (TEXT) — Khas / Acquisition status
-- `description` (TEXT) — Scenario details
-- `created_at` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+6. **উন্নত নাগরিক প্রাক-ক্রয় চেকলিস্ট (`/checklist`):**
+   - ফুল-উইডথ রেসপনসিভ লেআউট সহ ৭-দফা বাস্তবসম্মত অনুসন্ধান নির্দেশিকা।
+   - সম্পন্নতার অগ্রগতি ও চেকবক্সের অবস্থা ব্রাউজারের `localStorage`-এ স্থানীয়ভাবে সংরক্ষিত থাকে।
 
-### `transactions` Table
-- `id` (INTEGER PRIMARY KEY AUTOINCREMENT)
-- `plot_id` (TEXT NOT NULL, FOREIGN KEY -> plots.plot_id)
-- `transaction_ref` (TEXT NOT NULL) — Transaction reference code (e.g. `TX-1004-CLAIM-A`)
-- `deed_ref` (TEXT) — Specific deed cited in the transaction
-- `transaction_type` (TEXT NOT NULL) — Sale, Purchase, Inheritance, Gift, or Simulated Duplicate Sale
-- `transaction_date` (TEXT NOT NULL) — YYYY-MM-DD
-- `record_status` (TEXT NOT NULL) — "Active", "Superseded", or "Pending"
-- `conflict_group_id` (TEXT) — Identifies simulated conflict groups (e.g. `CONF-1004`)
+7. **হক শুফা বা অগ্রক্রয়াধিকার আইনি নির্দেশিকা (`/haq-shufa-guide`):**
+   - *State Acquisition and Tenancy Act, 1950* (Section 96), *Non-Agricultural Tenancy Act, 1949* (Section 24), এবং মুসলিম ব্যক্তিগত আইনের ভিত্তিতে ইন্টারেক্টিভ আইনি সচেতনতা টুল।
+   - ৬টি বাস্তবমুখী প্রশ্নের ওপর ভিত্তি করে ঝুঁকির মাত্রা ও আইনি অবস্থান মূল্যায়ন।
+   - ৩টি প্রি-ডিফাইন্ড টেস্ট দৃশ্যপট ও সরাসরি *Laws of Bangladesh* পোর্টালের সংবিধিবদ্ধ লিংক।
 
-Indexes are applied to `plots(plot_id)`, `plots(khatian_ref)`, `plots(deed_ref)`, `plots(demo_mouza_code)`, and `transactions(plot_id)`.
+8. **উন্নত প্রিন্ট-রেডি যাচাইকরণ সামারি রিপোর্ট (`/plots/<plot_id>/report`):**
+   - অপ্টিমাইজড প্রিন্ট সিএসএস (`@media print`)।
+   - পেজ-ব্রেক ব্যবস্থাপনা, দীর্ঘ রেফারেন্স ও ট্রানজাকশন কোডের টেক্সট-র‌্যাপিং এবং স্বাক্ষর ও ডিসক্লেইমার ব্লকের অখণ্ডতা নিশ্চিতকরণ।
 
----
-
-## 5. Synthetic Demonstration Data & Predictable Scenarios
-
-All data is strictly fictional. Key test cases include:
-1. **`PLOT-1001` (Clean Benchmark):** Complete records, completed mutation, no active litigation, 100% completeness score, no triggered flags.
-2. **`PLOT-1002` (Missing Mutation):** Valid deed but missing mutation record; triggers `RULE_INCOMPLETE_RECORD`.
-3. **`PLOT-1003` (Missing Deed Reference):** Lacks primary deed number in plot master table; triggers `RULE_INCOMPLETE_RECORD`.
-4. **`PLOT-1004` (Double-Selling Conflict):** Two active transactions (`TX-1004-CLAIM-A` & `TX-1004-CLAIM-B`) with distinct deeds under `CONF-1004`; triggers `RULE_DUP_SALE` (High Severity).
-5. **`PLOT-1005` (Reference Mismatch):** Plot master deed (`DEED-DEMO-1005-MASTER`) contradicts active transaction deed (`DEED-DEMO-1005-ALT`); triggers `RULE_REF_MISMATCH`.
-6. **`PLOT-1006` (Unverified Litigation):** Case status is unknown; triggers `RULE_UNKNOWN_CASE`.
-7. **`PLOT-1007` (Unverified Khas / Acquisition):** Vetting is unrecorded; triggers `RULE_UNKNOWN_KHAS`.
-8. **`PLOT-1008` (Multi-Warning Plot):** Combines missing mutation, unverified litigation, and unverified acquisition status.
-9. **`PLOT-1009` (Legitimate Historical Chain):** 3-stage chain (Inheritance 2012 -> Gift 2018 -> Sale 2022). Older records are marked `Superseded`, demonstrating that healthy multi-transfer histories do not trigger false conflict warnings.
+9. **সিস্টেম হেলথ চেক (`/health`):**
+   - ডাটাবেজ সংযোগ এবং সক্রিয় প্লটের সংখ্যা সংবলিত JSON রেসপন্স।
 
 ---
 
-## 6. Installation & Execution Guide
+## ৩. প্রযুক্তি কাঠামো (Technology Stack)
 
-For a controlled Linux VPS setup using Gunicorn, systemd, Nginx, a protected secret, and a database outside the release directory, see [docs/deployment.md](docs/deployment.md). The checked-in files under `deployment/` are configuration templates only; they do not deploy anything remotely.
+- **ব্যাকএন্ড ফ্রেমওয়ার্ক:** Python 3.9+, Flask 3.x, Jinja2 Template Engine, Gunicorn (প্রোডাকশন WSGI).
+- **ডাটাবেজ:** SQLite3 (স্ট্যান্ডার্ড লাইব্রেরি, ফরেন কি ও ইনডেক্সিং সহ প্যারামিটারাইজড কুয়েরি)।
+- **লোকালাইজেশন মডিউল:** `translations.py` — হালকা ও রক্ষণাবেক্ষণযোগ্য দ্বিভাষিক ডিকশনারি ও হেল্পার ফাংশন (`t()`, `get_checklist_items()`, `get_roadmap_items()`)।
+- **রুল ও লজিক ইঞ্জিন:** ডিটারমিনিস্টিক পাইথন রুল ইঞ্জিন (`risk_engine.py`, `haq_shufa_engine.py`) — কোনো ব্ল্যাক-বক্স মডেল বা এলএলএম নেই।
+- **ফ্রন্টএন্ড:** সেমান্টিক HTML5, কাস্টম সিএসএস ৩ ডিজাইন সিস্টেম, Bootstrap 5.3, Bootstrap Icons, ভ্যানিলা জাভাস্ক্রিপ্ট (কোনো অতিরিক্ত হেভিওয়েট ফ্রেমওয়ার্ক নেই)।
+- **স্বয়ংক্রিয় টেস্ট স্যুট:** `pytest` (৪০টি সম্পূর্ণ পাসিং টেস্ট কেস)।
 
-### Prerequisites
-- Python 3.10+ (or Python 3.11 installed via `uv`)
-- Web browser (Chrome, Edge, Firefox, or Safari)
+---
 
-### Step 1: Clone or Navigate to Project Directory
-```bash
-cd buyerguard-bd
+## ৪. সিস্টেম আর্কিটেকচার ও ডেটা প্রবাহ (Architecture & Request Flow)
+
+```
+[ব্রাউজার / ক্লায়েন্ট]
+         │ (HTTP GET / POST, ?lang=bn|en, session['lang'])
+         ▼
+[Flask app.py / @app.before_request Language Resolver]
+         │
+         ├───► [translations.py (Bangla/English Dictionary & Helpers)]
+         │
+         ├───► [database.py (SQLite3 Data Access Layer)]
+         │          └───► [buyerguard.db (plots & transactions)]
+         │
+         ├───► [risk_engine.py (5 Explainable Validation Rules & Completeness)]
+         │          └───► Localized Warnings & Evaluation Status
+         │
+         ├───► [haq_shufa_engine.py (Haq Shufa / Pre-emption Analysis)]
+         │          └───► Localized Findings, Statutes & Roadmap Table
+         │
+         ▼
+[HTML5 (lang="bn" / "en") + Bootstrap UI / Print Layout / JSON API]
 ```
 
-### Step 2: Create and Activate Virtual Environment
+---
+
+## ৫. লোকাল সেটআপ ও রান করার নির্দেশিকা (Local Setup Guide)
+
+### পূর্বশর্ত:
+- Python 3.9 বা তদূর্ধ্ব
+- যেকোনো আধুনিক ওয়েব ব্রাউজার
+
+### ধাপ ১: রিপোজিটরি ফোল্ডারে প্রবেশ করুন
 ```bash
-# Using standard Python:
-python -m venv .venv
+cd buyerguard-bd-release
+```
 
-# On Windows (PowerShell):
-.\.venv\Scripts\activate
-
-# On Linux/macOS:
+### ধাপ ২: ভার্চুয়াল এনভায়রনমেন্ট তৈরি ও সক্রিয় করুন
+```bash
+# লিনাক্স বা ম্যাকওএস:
+python3 -m venv .venv
 source .venv/bin/activate
+
+# উইন্ডোজ (PowerShell):
+.\.venv\Scripts\activate
 ```
 
-### Step 3: Install Required Packages
+### ধাপ ৩: ডিপেন্ডেন্সি ইনস্টল করুন
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Run the Application
+### ধাপ ৪: অ্যাপ্লিকেশন রান করুন
 ```bash
 python app.py
 ```
-*(The SQLite database automatically initializes and populates all 22 synthetic seed records on first launch.)*
+*(প্রথমবার চালুর সময় স্বয়ংক্রিয়ভাবে SQLite ডাটাবেজ তৈরি হবে এবং ২২টি কাল্পনিক ডেমো প্লটের সিড ডেটা লোড হবে।)*
 
-### Step 5: Open in Your Browser
-Visit: **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
+### ধাপ ৫: ব্রাউজারে প্রবেশ করুন
+ভিজিট করুন: **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
 
 ---
 
-## 7. Running the Automated Tests
+## ৬. টেস্ট পরিচালনা ও যাচাইকৃত ফলাফল (Automated Test Execution)
 
-To run the full suite of 24 unit and integration tests:
-
+সম্পূর্ণ স্বয়ংক্রিয় টেস্ট স্যুট রান করতে চালান:
 ```bash
 pytest -v
 ```
 
-Expected output:
+### যাচাইকৃত টেস্ট ফলাফল (Verified 40 Passing Tests):
 ```
-tests/test_app.py::test_landing_page PASSED
-tests/test_app.py::test_dashboard_statistics PASSED
-tests/test_app.py::test_search_known_plot PASSED
-tests/test_app.py::test_search_unknown_plot_not_found_state PASSED
-tests/test_app.py::test_clean_plot_detail PASSED
-tests/test_app.py::test_missing_mutation_scenario PASSED
-tests/test_app.py::test_missing_deed_scenario PASSED
-tests/test_app.py::test_duplicate_sale_scenario PASSED
-tests/test_app.py::test_mismatch_reference_scenario PASSED
-tests/test_app.py::test_unknown_case_scenario PASSED
-tests/test_app.py::test_unknown_khas_scenario PASSED
-tests/test_app.py::test_multi_warning_scenario PASSED
-tests/test_app.py::test_printable_report PASSED
-tests/test_app.py::test_standalone_checklist PASSED
-tests/test_app.py::test_health_endpoint PASSED
-tests/test_app.py::test_invalid_plot_returns_404 PASSED
-tests/test_app.py::test_no_official_government_claims PASSED
-tests/test_risk_engine.py::test_clean_plot_evaluation PASSED
-tests/test_risk_engine.py::test_missing_mutation_warning PASSED
-tests/test_risk_engine.py::test_missing_deed_ref_warning PASSED
-tests/test_risk_engine.py::test_duplicate_sale_conflict_warning PASSED
-tests/test_risk_engine.py::test_legitimate_historical_chain_does_not_trigger_duplicate_sale PASSED
-tests/test_risk_engine.py::test_inconsistent_reference_warning PASSED
-tests/test_risk_engine.py::test_unknown_case_and_khas_warnings PASSED
+tests/test_app.py::test_landing_page PASSED                              [  2%]
+tests/test_app.py::test_dashboard_statistics PASSED                      [  5%]
+tests/test_app.py::test_search_known_plot PASSED                         [  7%]
+tests/test_app.py::test_search_unknown_plot_not_found_state PASSED       [ 10%]
+tests/test_app.py::test_clean_plot_detail PASSED                         [ 12%]
+tests/test_app.py::test_missing_mutation_scenario PASSED                 [ 15%]
+tests/test_app.py::test_missing_deed_scenario PASSED                     [ 17%]
+tests/test_app.py::test_duplicate_sale_scenario PASSED                   [ 20%]
+tests/test_app.py::test_mismatch_reference_scenario PASSED               [ 22%]
+tests/test_app.py::test_unknown_case_scenario PASSED                     [ 25%]
+tests/test_app.py::test_unknown_khas_scenario PASSED                     [ 27%]
+tests/test_app.py::test_multi_warning_scenario PASSED                    [ 30%]
+tests/test_app.py::test_printable_report PASSED                          [ 32%]
+tests/test_app.py::test_standalone_checklist PASSED                      [ 35%]
+tests/test_app.py::test_health_endpoint PASSED                           [ 37%]
+tests/test_app.py::test_invalid_plot_returns_404 PASSED                  [ 40%]
+tests/test_app.py::test_custom_404_page PASSED                           [ 42%]
+tests/test_app.py::test_language_toggle_and_persistence PASSED           [ 45%]
+tests/test_app.py::test_no_official_government_claims PASSED             [ 47%]
+tests/test_app.py::test_custom_404_page_bilingual PASSED                 [ 50%]
+tests/test_app.py::test_plot_detail_responsive_tables_and_safe_disclaimers PASSED [ 52%]
+tests/test_haq_shufa.py::test_haq_shufa_route_renders_successfully PASSED [ 55%]
+tests/test_haq_shufa.py::test_haq_shufa_navigation_presence PASSED       [ 57%]
+tests/test_haq_shufa.py::test_haq_shufa_scenario_1_preload PASSED        [ 60%]
+tests/test_haq_shufa.py::test_haq_shufa_scenario_2_preload PASSED        [ 62%]
+tests/test_haq_shufa.py::test_haq_shufa_scenario_3_preload PASSED        [ 65%]
+tests/test_haq_shufa.py::test_haq_shufa_post_form_evaluation PASSED      [ 67%]
+tests/test_haq_shufa.py::test_haq_shufa_api_evaluation PASSED            [ 70%]
+tests/test_haq_shufa.py::test_haq_shufa_engine_unit_tests PASSED         [ 72%]
+tests/test_haq_shufa.py::test_haq_shufa_no_forbidden_government_claims PASSED [ 75%]
+tests/test_haq_shufa.py::test_entire_site_has_bengali_primary_language PASSED [ 77%]
+tests/test_haq_shufa.py::test_bengali_headings_and_disclaimers PASSED    [ 80%]
+tests/test_risk_engine.py::test_clean_plot_evaluation PASSED             [ 82%]
+tests/test_risk_engine.py::test_missing_mutation_warning PASSED          [ 85%]
+tests/test_risk_engine.py::test_missing_deed_ref_warning PASSED          [ 87%]
+tests/test_risk_engine.py::test_duplicate_sale_conflict_warning PASSED   [ 90%]
+tests/test_risk_engine.py::test_legitimate_historical_chain_does_not_trigger_duplicate_sale PASSED [ 92%]
+tests/test_risk_engine.py::test_superseded_conflict_marker_does_not_trigger_duplicate_sale PASSED [ 95%]
+tests/test_risk_engine.py::test_inconsistent_reference_warning PASSED    [ 97%]
+tests/test_risk_engine.py::test_unknown_case_and_khas_warnings PASSED    [100%]
 
-============================= 24 passed in 6.31s ==============================
+============================== 40 passed in 0.26s ==============================
 ```
 
 ---
 
-## 8. AI Coding Assistant Disclosure
+## ৭. অ্যাপ্লিকেশনের প্রধান রুটসমূহ (Application Routes)
 
-In accordance with LandTech Innovation Hackathon 2026 rules:
-- **Tool Used:** Antigravity AI Coding Assistant (Google DeepMind Advanced Agentic Coding).
-- **Role:** Antigravity assisted the development team in structuring the project files, configuring SQLite database schemas, coding the explainable risk engine rules, designing the responsive Bootstrap 5 interface, and generating the pytest test suite.
-- **Review & Ownership:** All code, logic, documentation, and synthetic data were reviewed, verified, and tested by the student team.
-
----
-
-## 9. Known Limitations & Future Roadmap
-
-### Current Limitations:
-- **Offline / Synthetic Prototype:** Uses an offline SQLite database. It is not connected to live government servers or the DGLRS e-Mutation API.
-- **Deterministic Rules:** Uses rule-based logic; it does not perform optical character recognition (OCR) on handwritten historical deeds.
-- **Single-Tenant Local MVP:** Designed for local evaluation without multi-user authentication.
-
-### Future Roadmap:
-1. **Government API Integration:** Direct read-only connection to Land Reform Board (LRB) e-Namjari and Sub-Registry e-Registration databases.
-2. **Bengali (Bangla) Language Localization:** Full bilingual toggle for English and Bengali to maximize citizen accessibility across rural upazilas.
-3. **GIS & Mouza Map Boundary Overlay:** Integration with Bangladesh Digital Survey (BDS) spatial coordinates to visualize physical plot boundaries.
+| মেথড | ইউআরএল পাথ | উদ্দেশ্য |
+| :--- | :--- | :--- |
+| `GET` | `/` | ল্যান্ডিং পেজ, হিরো সার্চ বার এবং ডেমো সিনারিও বাটন |
+| `GET` | `/dashboard` | ড্যাশবোর্ড ও সার্বিক পরিসংখ্যান |
+| `GET` | `/search` | প্লট, খতিয়ান, দলিল বা মৌজা অনুসন্ধান ফলাফল |
+| `GET` | `/plots/<plot_id>` | নির্দিষ্ট প্লটের বিস্তারিত তথ্য, রুল ইঞ্জিনের ফলাফল ও চেকলিস্ট |
+| `GET` | `/plots/<plot_id>/report` | প্রিন্টযোগ্য যাচাইকরণ রিপোর্ট (Print Layout) |
+| `GET` | `/checklist` | একক ইন্টারেক্টিভ ৭-দফা প্রাক-ক্রয় নাগরিক চেকলিস্ট |
+| `GET, POST` | `/haq-shufa-guide` | হক শুফা বা অগ্রক্রয়াধিকার আইনি নির্দেশিকা ও মূল্যায়ন টুল |
+| `POST` | `/api/haq-shufa/evaluate` | হক শুফা মূল্যায়নের স্ট্রাকচার্ড JSON API এন্ডপয়েন্ট |
+| `GET` | `/set-language` | ভাষা পরিবর্তন (`lang=bn` বা `lang=en`) এবং পূর্ববর্তী পেজে নিরাপদ রিডাইরেক্ট |
+| `GET` | `/health` | সিস্টেম স্বাস্থ্য ও ডাটাবেজ স্ট্যাটাস চেক |
 
 ---
 
-## 10. Data, Privacy & Ethical Statement
+## ৮. লগইন সিস্টেম সংক্রান্ত সিদ্ধান্ত (Login System Assessment & Decision)
 
-- **100% Synthetic Data:** No real citizen names, National ID (NID) numbers, phone numbers, or real-world parcel coordinates exist within this repository.
-- **No Scraping:** The system does not scrape or crawl government websites.
-- **Responsible Claims:** The system explicitly avoids words like "Government Verified", "Ownership Guaranteed", or "Legally Safe". All generated reports and screens display a mandatory synthetic data disclaimer.
+- **বর্তমান অবস্থা:** এই রিলিজে নতুন কোনো লগইন সিস্টেম বাস্তবায়ন করা হয়নি।
+- **কারণ ও বিশ্লেষণ:** ল্যান্ডটেক ২০২৬-এর অফিসিয়াল রুল বুক (Rule Book)-এ প্রাক-ক্রয় ভূমি যাচাইকরণের জন্য ব্যবহারকারী লগইন/নিবন্ধনকে বাধ্যতামূলক শর্ত হিসেবে উল্লেখ করা হয়নি। নাগরিক পর্যায়ে প্রাক-ক্রয় যাচাইকরণের ক্ষেত্রে পাবলিক এক্সেসিবিলিটি দ্রুত তথ্য যাচাইয়ে সহায়ক। যদিও টিম মিটিং নোটে লগইনকে একটি ফিচার হিসেবে আলোচনা করা হয়েছিল, হ্যাকাথন নিয়মের সাথে সমন্বয় ও স্কোপ নিয়ন্ত্রণের স্বার্থে এটি কার্যকর করার পূর্বে টিম ও আয়োজকদের সাথে পুনরায় নিশ্চিতকরণের জন্য স্থগিত রাখা হয়েছে।
+- **ভবিষ্যৎ পরিকল্পনা:** যদি অফিসিয়াল আয়োজক কমিটি বা টিম সিদ্ধান্ত অনুযায়ী ইউজার প্রোফাইল বা পারসোনালাইজড হিস্ট্রি সংরক্ষণের জন্য লগইন বাধ্যতামূলক করা হয়, তবে পরবর্তী রিলিজে নিরাপদ সেশন ও পাসওয়ার্ড হ্যাশিং সহ তা যুক্ত করা হবে।
 
 ---
-**BuyerGuard BD &copy; 2026** &bull; Daffodil International University LandTech Innovation Hackathon Submission.
+
+## ৯. তথ্যের উৎস ও কাল্পনিক ডেটার স্পষ্টীকরণ (Synthetic Data Disclosure)
+
+- এই অ্যাপ্লিকেশনে ব্যবহৃত সকল তথ্য (**২২টি প্লট ও সংশ্লিষ্ট লেনদেন**) সম্পূর্ণ কাল্পনিক (Synthetic / Simulated)।
+- কোনো প্রকৃত নাগরিকের নাম, জাতীয় পরিচয়পত্র নম্বর (NID), ফোন নম্বর বা প্রকৃত ভূমির খতিয়ান এতে অন্তর্ভুক্ত নয়।
+- কোনো অননুমোদিত তথ্যভাণ্ডার বা সরকারি ওয়েবসাইট থেকে ডাটা স্ক্র্যাপিং করা হয়নি।
+
+---
+
+## ১০. সিস্টেমের সীমাবদ্ধতা (Explicit Limitations)
+
+1. **কোনো লাইভ সরকারি এপিআই সংযোগ নেই (No Live Government Integration):** এটি কোনো সরকারি ভূমি অফিস, ভূমি রেকর্ড ও জরিপ অধিদপ্তর (DGLRS) বা সাব-রেজিস্ট্রির লাইভ সার্ভারের সাথে সংযুক্ত নয়।
+2. **কোনো ওসিআর বা হস্তলিখিত দলিল স্ক্যানার নেই (No OCR):** প্রাচীন বা হস্তলিখিত দলিল স্ক্যান করে স্বয়ংক্রিয় টেক্সট এক্সট্রাকশন এই প্রোটোটাইপের আওতাভুক্ত নয়।
+3. **প্রোডাক্টের ভেতরে কোনো এলএলএম বা এমএল মডেল নেই (No In-App LLM/ML Model):** প্ল্যাটফর্মটি সম্পূর্ণ ডিটারমিনিস্টিক পাইথন রুল ইঞ্জিনে পরিচালিত। কোনো জেনারেটিভ এআই হ্যালুসিনেশন বা ব্ল্যাক-বক্স ঝুঁকি এখানে নেই।
+4. **আইনি পরামর্শের বিকল্প নয়:** এই প্ল্যাটফর্মের কোনো ফলাফল বা রিপোর্ট আদালতের আইনি বৈধতার নিশ্চয়তা দেয় না। জমি ক্রয়ের পূর্বে অবশ্যই পেশাদার আইনজীবীর পরামর্শ নেওয়া আবশ্যক।
+
+---
+
+## ১১. নিরাপত্তা ও ডেটা অখণ্ডতা (Security Considerations)
+
+- **প্যারামিটারাইজড এসকিউএল (Parameterized Queries):** এসকিউএল ইনজেকশন প্রতিরোধে সকল ডাটাবেজ কুয়েরিতে প্যারামিটার বাইন্ডিং নিশ্চিত করা হয়েছে।
+- **নিরাপদ টেমপ্লেট রেন্ডারিং (Safe Template Rendering):** ক্রস-সাইট স্ক্রিপ্টিং (XSS) প্রতিরোধে Jinja2-এর অটো-এসকেপিং সক্রিয়।
+- **তথ্য গোপনীয়তা (Privacy Protection):** ব্যবহারকারীর কোনো ব্যক্তিগত সংবেদনশীল তথ্য সার্ভারে জমা রাখা হয় না; চেকলিস্টটি সম্পূর্ণরূপে ব্রাউজারের লোকাল স্টোরেজে সংরক্ষিত থাকে।
+- **নিরাপদ রিডাইরেক্ট (Open Redirect Prevention):** ভাষা পরিবর্তন রুটে (`/set-language`) কেবলমাত্র লোকাল রিলেটিভ পাথেই রিডাইরেকশন অনুমোদিত।
+- **উৎপাদন নিরাপত্তা (Production Security):** গোপন কি (`SECRET_KEY`) পরিবেশ ভেরিয়েবল থেকে লোড করা হয়।
+
+---
+
+## ১২. সাম্প্রতিক পরিবর্তনের সারসংক্ষেপ (Changelog & Recent Enhancements)
+
+- **সম্পূর্ণ দ্বিভাষিক রূপান্তর ও ওয়ান-ক্লিক টগল:** বাংলা ডিফল্ট রেখে সম্পূর্ণ ওয়েবসাইটে নির্বিঘ্ন বাংলা–ইংরেজি টগল বাটন (`বাংলা | English`) বাস্তবায়িত হয়েছে।
+- **ইউআই ও টেবিল রেসপনসিভনেস উন্নয়ন:** ট্রানজাকশন হিস্ট্রির সংকীর্ণ কলামের সমস্যা দূর করে অনুভূমিক স্ক্রোল ও ওয়ার্ড-ব্রেকিং নিশ্চিত করা হয়েছে।
+- **চেকলিস্ট ও প্রিন্ট লেআউট সংস্কার:** চেকলিস্ট পেজের প্রশস্ততা বৃদ্ধি করা হয়েছে এবং প্রিন্ট রিপোর্টে স্বাক্ষর ও দায়মুক্তি সংক্রান্ত অংশ যাতে কোনোভাবেই কেটে না যায় তা নিশ্চিত করা হয়েছে।
+- **আইনি পরিভাষা সংশোধন:** "Clean Title" পরিহার করে শিক্ষামূলক ও নিরপেক্ষ সতর্কতাহীন পরিভাষা ("No Warning Indicators Detected in Demo Data") প্রয়োগ করা হয়েছে।
+- **টেস্ট সুইট সম্প্রসারণ:** পূর্বের ৩৭টি টেস্ট থেকে বৃদ্ধি করে মোট ৪০টি স্বয়ংক্রিয় টেস্ট কেসে উন্নীত করা হয়েছে এবং ১০০% টেস্ট পাসিং নিশ্চিত করা হয়েছে।
+
+---
+
+## ১৩. এআই ট্যুল ব্যবহার সংক্রান্ত প্রকাশনা (AI Tools Disclosure)
+
+ল্যান্ডটেক হ্যাকাথন ২০২৬-এর অফিসিয়াল নিয়মাবলী অনুযায়ী প্রজেক্ট ডেভেলপমেন্ট চলাকালীন ব্যবহৃত এআই ট্যুলসমূহের বিবরণ নিম্নে প্রদান করা হলো:
+
+- **[Google Antigravity](https://antigravity.google/):**
+  - *ভূমিকা:* এআই-সহায়ক কোডিং, দ্বিভাষিক লোকালাইজেশন আর্কিটেকচার প্রণয়ন, স্বয়ংক্রিয় টেস্ট কেস উন্নয়ন, ইউআই/ইউএক্স রেসপনসিভনেস সংস্কার এবং নিরাপত্তা ও কোড নিরীক্ষা।
+- **[ChatGPT](https://chatgpt.com/):**
+  - *ভূমিকা:* প্রজেক্টের পরিকল্পনা ও ধারণা স্পষ্টীকরণ, প্রযুক্তিগত ব্যাখ্যার খসড়া তৈরি, ডেভেলপমেন্ট প্রম্পট প্রস্তুত এবং ডকুমেন্টেশন সহায়তায় ব্যবহৃত হয়েছে।
+- **[Google Gemini](https://gemini.google.com/):**
+  - *ভূমিকা:* দলীয় মিটিং নোট সারসংক্ষেপকরণ, হ্যাকাথন নিয়মের বিশ্লেষণ এবং আইনি প্রেক্ষাপটের প্রাথমিক গবেষণায় সহায়ক হিসেবে ব্যবহৃত হয়েছে।
+- **[Claude](https://claude.ai/):**
+  - *ভূমিকা:* প্রজেক্টের কনসেপ্ট নোট পরিমার্জন ও প্রেজেন্টেশন স্লাইডের স্ট্রাকচারিংয়ে সহায়ক হিসেবে ব্যবহৃত হয়েছে।
+- **[Kimi](https://www.kimi.ai/):**
+  - *ভূমিকা:* পিচ-ডেক ও কনসেপ্ট নোটের ভাষা সম্পাদনায় সহায়ক হিসেবে ব্যবহৃত হয়েছে।
+
+> **দায়িত্ব ও মালিকানা সংক্রান্ত বিবৃতি (Student Team Ownership Statement):**
+> উপরের এআই টুলগুলো কেবলমাত্র পরিকল্পনা, কোডিং সহায়তা এবং ডকুমেন্টেশনের সহায়ক হিসেবে ব্যবহৃত হয়েছে। ওয়েবসাইটের অ্যাপ্লিকেশনটির নিজস্ব কোডের ভেতরে কোনো তৃতীয় পক্ষীয় এলএলএম এপিআই রান করে না। সম্পূর্ণ কোডবেস, রুল ইঞ্জিনের যুক্তি, ডাটাবেজ মডেল, নিরাপত্তা ও টেস্টের ফলাফল শিক্ষার্থী দল কর্তৃক পুঙ্খানুপুঙ্খভাবে পরীক্ষিত, যাচাইকৃত এবং দলীয়ভাবে উপস্থাপিত।
+
+---
+**BuyerGuard BD &copy; 2026** &bull; ল্যান্ডটেক ইনোভেশন হ্যাকাথন ২০২৬, ড্যাফোডিল ইন্টারন্যাশনাল ইউনিভার্সিটি (DIU)।
