@@ -5,7 +5,7 @@ disclaimers, 404 error states, language toggle, and bilingual translations.
 """
 
 import pytest
-from app import app
+from app import app, _configured_secret_key
 from database import get_all_plots, init_db
 from seed_data import seed_database
 
@@ -14,6 +14,7 @@ from seed_data import seed_database
 def client():
     """Configure Flask test client with test mode."""
     app.config["TESTING"] = True
+    app.config["SECRET_KEY"] = "buyer-guard-test-only-secret"
     with app.test_client() as client:
         with app.app_context():
             init_db()
@@ -291,6 +292,49 @@ def test_language_toggle_and_persistence(client):
     assert "জমি ক্রয়ের পূর্বে সতর্ক হোন" in home_html2 or "যাচাই" in home_html2
 
 
+def test_language_redirect_allows_internal_destination_and_removes_language_override(client):
+    response = client.get("/set-language?lang=en&next=%2Fdashboard%3Fstatus%3DReview%2BNeeded%26lang%3Dbn")
+
+    assert response.status_code == 302
+    assert response.location == "/dashboard?status=Review+Needed"
+    dashboard = client.get(response.location)
+    assert '<html lang="en">' in dashboard.get_data(as_text=True)
+
+
+@pytest.mark.parametrize("destination", [
+    "https://attacker.example/steal-session",
+    "//attacker.example/steal-session",
+    "/%5C%5Cattacker.example/path",
+    "http://%5B::1",
+])
+def test_language_redirect_rejects_external_and_malformed_destinations(client, destination):
+    response = client.get("/set-language", query_string={"lang": "en", "next": destination})
+
+    assert response.status_code == 302
+    assert response.location == "/"
+
+
+def test_language_redirect_uses_only_safe_referrer_when_next_is_absent(client):
+    response = client.get("/set-language?lang=en", headers={"Referer": "https://attacker.example/path"})
+
+    assert response.status_code == 302
+    assert response.location == "/"
+
+
+def test_production_requires_explicit_secret_key():
+    with pytest.raises(RuntimeError, match="SECRET_KEY must be explicitly configured in production"):
+        _configured_secret_key({"APP_ENV": "production"})
+
+    with pytest.raises(RuntimeError, match="replace the example value"):
+        _configured_secret_key({"APP_ENV": "production", "SECRET_KEY": "replace-with-a-long-random-value"})
+
+    with pytest.raises(RuntimeError, match="at least 32 characters"):
+        _configured_secret_key({"APP_ENV": "production", "SECRET_KEY": "too-short"})
+
+    configured_key = "configured-production-secret-value-123456"
+    assert _configured_secret_key({"APP_ENV": "production", "SECRET_KEY": configured_key}) == configured_key
+
+
 def test_no_official_government_claims(client):
     """Ensure no page claims official government certification, ownership guarantee, or legal clearance."""
     pages = ["/", "/dashboard", "/plots/PLOT-1001", "/plots/PLOT-1004", "/plots/PLOT-1001/report", "/checklist"]
@@ -334,3 +378,128 @@ def test_plot_detail_responsive_tables_and_safe_disclaimers(client):
     assert "min-width: 620px" in html
     assert "text-break" in html
     assert "কাল্পনিক প্রদর্শনী" in html or "সতর্কবার্তা" in html
+
+
+def test_plot_detail_renders_plot_scoped_seven_check_review_in_both_languages(client):
+    """Each selected demo plot gets its own ordered, complete seven-check UI in both languages."""
+    import re
+
+    for plot_id in ("PLOT-1001", "PLOT-1002", "PLOT-1004"):
+        for lang in ("bn", "en"):
+            response = client.get(f"/plots/{plot_id}?lang={lang}")
+            assert response.status_code == 200
+            html = response.get_data(as_text=True)
+            assert f"Plot Record: {plot_id}" in html if lang == "en" else plot_id in html
+            assert 'class="diligence-check diligence-' in html
+            assert len(re.findall(r'<article class="diligence-check diligence-', html)) == 7
+            step_numbers = re.findall(r'class="diligence-step-number"[^>]*>(\d+)</span>', html)
+            assert step_numbers == ["1", "2", "3", "4", "5", "6", "7"]
+            assert "diligence-pass" in html or "diligence-warning" in html or "diligence-insufficient-data" in html
+            assert "diligence-needs-review" in html or "diligence-not-applicable" in html or "diligence-pass" in html
+            assert "Explanation" in html if lang == "en" else "ব্যাখ্যা" in html
+            assert "No conflicts reported for this check." in html if lang == "en" else "কোনো দ্বন্দ্ব উল্লেখ নেই" in html
+            assert "No missing information reported for this check." in html if lang == "en" else "কোনো অনুপস্থিত তথ্য উল্লেখ নেই" in html
+            assert "Recommended Next Diligence Action" in html if lang == "en" else "পরামর্শকৃত যাচাইকরণ পদক্ষেপ" in html
+            assert "not been officially verified" in html if lang == "en" else "সরকারি রেকর্ড" in html
+            assert html.count("diligence-explanation") == 7
+            assert html.count("diligence-conflicts") == 7
+            assert html.count("diligence-missing") == 7
+            assert html.count("diligence-action") == 7
+
+
+def test_checklist_and_print_report_design_render_in_both_languages(client):
+    """Checklist and printable report retain plot scope, seven checks, disclaimers and responsive styling."""
+    import re
+
+    for lang in ("bn", "en"):
+        checklist = client.get(f"/checklist?plot=PLOT-1004&lang={lang}")
+        assert checklist.status_code == 200
+        checklist_html = checklist.get_data(as_text=True)
+        assert f'<html lang="{lang}">' in checklist_html
+        assert "PLOT-1004" in checklist_html
+        assert len(re.findall(r'<article class="diligence-check diligence-', checklist_html)) == 7
+        assert re.findall(r'class="diligence-step-number"[^>]*>(\d+)</span>', checklist_html) == ["1", "2", "3", "4", "5", "6", "7"]
+        assert checklist_html.count("diligence-conflicts") == 7
+        assert checklist_html.count("diligence-missing") == 7
+        assert checklist_html.count("diligence-action") == 7
+
+        report = client.get(f"/plots/PLOT-1004/report?lang={lang}")
+        assert report.status_code == 200
+        report_html = report.get_data(as_text=True)
+        assert f'<html lang="{lang}">' in report_html
+        assert "PLOT-1004" in report_html
+        assert len(re.findall(r'<article class="diligence-check diligence-[^"]+ report-check">', report_html)) == 7
+        assert "SYNTHETIC DEMONSTRATION RECORD" in report_html if lang == "en" else "কাল্পনিক প্রদর্শনী রেকর্ড" in report_html
+        assert "NOT AN OFFICIAL GOVERNMENT DOCUMENT" in report_html if lang == "en" else "সরকারি কোনো অফিশিয়াল দলিল নয়" in report_html
+
+    stylesheet = client.get("/static/css/style.css")
+    assert stylesheet.status_code == 200
+    css = stylesheet.get_data(as_text=True)
+    assert "@media print" in css and "break-inside: avoid" in css
+    assert ".report-document.card" in css and "@media (max-width: 767.98px)" in css
+    assert ".haq-demo-actions" in css and ".checklist-page" in css
+
+
+def test_language_switch_and_remaining_page_chrome_are_bilingual(client):
+    """Language switching persists across checklist and guide views; shared navigation/footer stay usable."""
+    switch = client.get("/set-language?lang=en&next=/checklist")
+    assert switch.status_code == 302
+    assert switch.location == "/checklist"
+    checklist = client.get("/checklist")
+    html = checklist.get_data(as_text=True)
+    assert '<html lang="en">' in html
+    assert "English" in html and "Haq Shufa" in html
+
+    guide = client.get("/haq-shufa-guide?scenario=DEMO-SHUFA-02")
+    guide_html = guide.get_data(as_text=True)
+    assert guide.status_code == 200 and '<html lang="en">' in guide_html
+    assert "Legal Evaluation Tool" in guide_html
+    assert 'for="field_property_type"' in guide_html
+    assert 'for="field_easement_status"' in guide_html
+
+    footer = html.split("<footer", 1)[1].split("</footer>", 1)[0]
+    assert '<span class="badge' not in footer
+
+
+def test_remaining_pages_responsive_layout_and_english_not_found(client):
+    """Remaining page templates expose responsive component hooks and a localized 404/search state."""
+    css = client.get("/static/css/style.css").get_data(as_text=True)
+    assert "@media (max-width: 575.98px)" in css
+    assert ".navbar-search" in css and ".footer-nav-link" in css
+    assert ".haq-question" in css and ".report-transactions" in css
+    assert ".table-responsive[tabindex=\"0\"]:focus-visible" in css
+    assert "outline: 3px solid var(--teal-800)" in css
+
+    for lang in ("bn", "en"):
+        dashboard = client.get(f"/dashboard?lang={lang}").get_data(as_text=True)
+        assert f'<html lang="{lang}">' in dashboard
+        assert 'id="table-search-status"' in dashboard and 'aria-live="polite"' in dashboard
+        assert 'tabindex="0" aria-label=' in dashboard
+        assert "navbar-expand-xl" in dashboard
+
+    missing = client.get("/unknown-route-for-english?lang=en")
+    assert missing.status_code == 404
+    html = missing.get_data(as_text=True)
+    assert '<html lang="en">' in html
+    assert "Search demo records" in html
+    assert "Information or page not found" in html or "Requested Page or Record Not Found" in html
+
+
+def test_page_heading_outline_has_no_skipped_levels_in_bangla_and_english(client):
+    """Primary page headings follow a usable outline on the key Bangla and English screens."""
+    import re
+
+    routes = (
+        "/", "/dashboard", "/checklist?plot=PLOT-1004",
+        "/haq-shufa-guide?scenario=DEMO-SHUFA-02", "/search?q=PLOT-1001",
+        "/plots/PLOT-1001", "/plots/PLOT-1001/report", "/unknown-heading-check",
+    )
+    for route in routes:
+        for lang in ("bn", "en"):
+            response = client.get(f"{route}{'&' if '?' in route else '?'}lang={lang}")
+            assert response.status_code in (200, 404)
+            html = response.get_data(as_text=True)
+            assert f'<html lang="{lang}">' in html
+            levels = [int(level) for level in re.findall(r"<h([1-6])\b", html, flags=re.IGNORECASE)]
+            assert levels, f"No headings found on {route} ({lang})"
+            assert all(next_level <= level + 1 for level, next_level in zip(levels, levels[1:])), (route, lang, levels)

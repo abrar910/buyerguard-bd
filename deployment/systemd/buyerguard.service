@@ -8,6 +8,7 @@ User=buyerguard
 Group=buyerguard
 WorkingDirectory=/srv/buyerguard-bd/current
 EnvironmentFile=/etc/buyerguard-bd/buyerguard.env
+Environment=APP_ENV=production
 ExecStart=/srv/buyerguard-bd/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8000 --access-logfile - --error-logfile - wsgi:app
 Restart=on-failure
 RestartSec=5

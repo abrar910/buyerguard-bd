@@ -18,7 +18,7 @@ Use a dedicated unprivileged account and keep the SQLite database outside the re
 1. Install Python 3.11+, `python3-venv`, Nginx, and a system service manager on a supported Linux VPS.
 2. Create `/srv/buyerguard-bd/current`, `/srv/buyerguard-bd/shared`, and `/etc/buyerguard-bd` owned by the `buyerguard` account.
 3. Extract the release into `current`; create the virtual environment in `venv`; install `requirements.txt`.
-4. Copy `.env.example` to `/etc/buyerguard-bd/buyerguard.env`, set a long random `SECRET_KEY`, and keep the file readable only by the service account.
+4. Copy `.env.example` to `/etc/buyerguard-bd/buyerguard.env`, replace the example `SECRET_KEY` with at least 32 random characters, and keep the file readable only by the service account. The systemd unit sets `APP_ENV=production`; startup refuses missing, placeholder, or short production secrets.
 5. Set `BUYERGUARD_DB=/srv/buyerguard-bd/shared/buyerguard.db`. On first start the app creates and seeds the synthetic database.
 6. Install `deployment/systemd/buyerguard.service` and edit the Nginx example with the real hostname. Put TLS termination and HTTP-to-HTTPS redirect in front of the service.
 

@@ -3,7 +3,7 @@
 {% block title %}{{ t('haq_shufa_page_title') }} — {{ app_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 haq-shufa-page">
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb mb-2 small text-muted">
@@ -13,7 +13,7 @@
   </nav>
 
   <!-- Hero Header -->
-  <div class="card card-custom p-4 p-md-5 mb-4 text-white" style="background: linear-gradient(135deg, var(--brand-navy-900) 0%, var(--brand-navy-800) 100%); border-left: 5px solid var(--brand-teal-500);">
+  <div class="card card-custom haq-shufa-hero p-4 p-md-5 mb-4 text-white">
     <div class="row align-items-center g-4">
       <div class="col-lg-8">
         <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 text-teal-100 small mb-3 border border-white border-opacity-15">
@@ -54,19 +54,19 @@
   <div class="row g-4 mb-4">
     <div class="col-lg-7">
       <div class="card card-custom p-4 h-100 bg-white">
-        <h4 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
+        <h2 class="h4 fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-info-circle text-teal"></i>
           {{ t('haq_shufa_what_title') }}
-        </h4>
+        </h2>
 
         <div class="mb-3">
-          <h6 class="fw-bold text-navy">
+          <h3 class="h6 fw-bold text-navy">
             {% if current_lang == 'en' %}
             What is the Right of Pre-emption (Haq Shufa)?
             {% else %}
             হক শুফা (Right of Pre-emption) বলতে কী বোঝায়?
             {% endif %}
-          </h6>
+          </h3>
           <p class="text-secondary small mb-2">
             {{ t('haq_shufa_what_desc') }}
           </p>
@@ -76,13 +76,13 @@
         </div>
 
         <div class="mb-3">
-          <h6 class="fw-bold text-navy">
+          <h3 class="h6 fw-bold text-navy">
             {% if current_lang == 'en' %}
             Why Does Applicability Depend on Property Class &amp; Facts?
             {% else %}
             জমির শ্রেণি ও তথ্যের ওপর কেন এর প্রয়োগ নির্ভরশীল?
             {% endif %}
-          </h6>
+          </h3>
           {% if current_lang == 'en' %}
           <p class="text-secondary small mb-2">
             In Bangladesh, pre-emption is not evaluated by a generic formula; it depends strictly on verifiable legal facts:
@@ -125,10 +125,10 @@
     <!-- Verified Statutory Framework -->
     <div class="col-lg-5">
       <div class="card card-custom p-4 h-100 bg-white">
-        <h4 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
+        <h2 class="h4 fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-bank text-primary"></i>
           {{ t('haq_shufa_statute_title') }}
-        </h4>
+        </h2>
         <p class="text-muted small mb-3">
           {% if current_lang == 'en' %}
           Primary statutory provisions governing pre-emption in Bangladesh. Direct links to the Ministry of Law's <em>Laws of Bangladesh</em> portal are provided below.
@@ -146,9 +146,9 @@
                 {{ t('haq_shufa_official_law_text') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
               </a>
             </div>
-            <h6 class="fw-bold mb-1 text-navy">
+            <h3 class="h6 fw-bold mb-1 text-navy">
               {% if current_lang == 'en' %}Section 96 &bull; Agricultural Land (SAT Act){% else %}ধারা ৯৬ (Section 96) &bull; কৃষিজমি (SAT Act){% endif %}
-            </h6>
+            </h3>
             <p class="small text-secondary mb-1">
               <strong>{% if current_lang == 'en' %}Scope:{% else %}আওতা:{% endif %}</strong> {% if current_lang == 'en' %}Agricultural holdings and raiyati tenancies.{% else %}কৃষিজমি ও রায়তি জোত।{% endif %}
             </p>
@@ -168,9 +168,9 @@
                 {{ t('haq_shufa_official_law_text') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
               </a>
             </div>
-            <h6 class="fw-bold mb-1 text-navy">
+            <h3 class="h6 fw-bold mb-1 text-navy">
               {% if current_lang == 'en' %}Section 24 &bull; Non-Agricultural Land (NAT Act){% else %}ধারা ২৪ (Section 24) &bull; অকৃষি জমি (NAT Act){% endif %}
-            </h6>
+            </h3>
             <p class="small text-secondary mb-1">
               <strong>{% if current_lang == 'en' %}Scope:{% else %}আওতা:{% endif %}</strong> {% if current_lang == 'en' %}Residential, commercial, or homestead non-agricultural tenancies.{% else %}বসতবাড়ি, বাণিজ্যিক বা আবাসিক অকৃষি প্রজাস্বত্ব।{% endif %}
             </p>
@@ -188,9 +188,9 @@
               <span class="badge bg-secondary">Muslim Personal Law</span>
               <span class="small text-muted">{% if current_lang == 'en' %}Muhammadan Law{% else %}মোহামেডান ল (Muhammadan Law){% endif %}</span>
             </div>
-            <h6 class="fw-bold mb-1 text-navy">
+            <h3 class="h6 fw-bold mb-1 text-navy">
               {% if current_lang == 'en' %}Haq Shufa &bull; Muslim Personal Law Pre-emption{% else %}হক শুফা &bull; মুসলিম ব্যক্তিগত আইন বিধান{% endif %}
-            </h6>
+            </h3>
             <p class="small text-secondary mb-1">
               {% if current_lang == 'en' %}
               Three classes of claimants: (1) <em>Shafi-i-Sharik</em> (co-sharers), (2) <em>Shafi-i-Khalit</em> (participators in immunities/easements), and (3) <em>Shafi-i-Jar</em> (adjacent owners).
@@ -212,16 +212,16 @@
   </div>
 
   <!-- Interactive Educational Assessment Tool -->
-  <div class="card card-custom p-4 p-md-5 mb-4 bg-white" id="haq-shufa-assessment-card">
+  <div class="card card-custom haq-assessment p-4 p-md-5 mb-4 bg-white" id="haq-shufa-assessment-card">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom gap-3">
       <div>
         <div class="d-flex align-items-center gap-2 mb-1">
           <span class="badge bg-dark">{% if current_lang == 'en' %}Legal Evaluation Tool{% else %}আইনি মূল্যায়ন টুল{% endif %}</span>
           <span class="badge bg-light text-dark border">{% if current_lang == 'en' %}Educational Model{% else %}ডেমোনস্ট্রেশন মডেল{% endif %}</span>
         </div>
-        <h3 class="fw-bold mb-1 text-navy" style="color: var(--brand-navy-900);">
+        <h2 class="h3 fw-bold mb-1 text-navy" style="color: var(--brand-navy-900);">
           {{ t('haq_shufa_tool_title') }}
-        </h3>
+        </h2>
         <p class="text-muted small mb-0">
           {{ t('haq_shufa_tool_desc') }}
         </p>
@@ -230,7 +230,7 @@
       <!-- Quick Demo Scenario Loaders -->
       <div class="text-md-end">
         <span class="small d-block text-muted mb-1">{{ t('haq_shufa_load_demo') }}</span>
-        <div class="btn-group btn-group-sm">
+        <div class="btn-group btn-group-sm haq-demo-actions">
           <a href="{{ url_for('haq_shufa_guide', scenario='DEMO-SHUFA-01') }}" class="btn btn-outline-danger">
             {{ t('haq_shufa_scenario_1_btn') }}
           </a>
@@ -246,12 +246,12 @@
 
     <!-- Assessment Form -->
     <form method="POST" action="{{ url_for('haq_shufa_guide') }}" id="haq-shufa-form">
-      <div class="row g-4">
+      <div class="row g-4 haq-question-grid">
 
         <!-- Question 1: Property Type -->
         <div class="col-md-6">
-          <div class="p-3 rounded-3 border h-100 bg-light-subtle">
-            <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
+          <div class="haq-question p-3 rounded-3 border h-100 bg-light-subtle">
+            <label for="field_property_type" class="form-label fw-bold text-navy d-flex align-items-center gap-2">
               <span class="badge bg-primary">{% if current_lang == 'en' %}1{% else %}১{% endif %}</span>
               {% if current_lang == 'en' %}Property Classification{% else %}জমির শ্রেণিবিভাগ (Property Classification){% endif %}
             </label>
@@ -279,8 +279,8 @@
 
         <!-- Question 2: Co-Ownership -->
         <div class="col-md-6">
-          <div class="p-3 rounded-3 border h-100 bg-light-subtle">
-            <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
+          <div class="haq-question p-3 rounded-3 border h-100 bg-light-subtle">
+            <label for="field_co_ownership" class="form-label fw-bold text-navy d-flex align-items-center gap-2">
               <span class="badge bg-primary">{% if current_lang == 'en' %}2{% else %}২{% endif %}</span>
               {% if current_lang == 'en' %}Co-Ownership Origin{% else %}শরিকানা স্বত্বের উৎস (Co-Ownership Origin){% endif %}
             </label>
@@ -311,8 +311,8 @@
 
         <!-- Question 3: Partition Status -->
         <div class="col-md-6">
-          <div class="p-3 rounded-3 border h-100 bg-light-subtle">
-            <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
+          <div class="haq-question p-3 rounded-3 border h-100 bg-light-subtle">
+            <label for="field_partition_status" class="form-label fw-bold text-navy d-flex align-items-center gap-2">
               <span class="badge bg-primary">{% if current_lang == 'en' %}3{% else %}৩{% endif %}</span>
               {% if current_lang == 'en' %}Partition &amp; Demarcation{% else %}সীমানা ও বণ্টননামা (Partition &amp; Demarcation){% endif %}
             </label>
@@ -343,8 +343,8 @@
 
         <!-- Question 4: Transfer Scope -->
         <div class="col-md-6">
-          <div class="p-3 rounded-3 border h-100 bg-light-subtle">
-            <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
+          <div class="haq-question p-3 rounded-3 border h-100 bg-light-subtle">
+            <label for="field_transfer_scope" class="form-label fw-bold text-navy d-flex align-items-center gap-2">
               <span class="badge bg-primary">{% if current_lang == 'en' %}4{% else %}৪{% endif %}</span>
               {% if current_lang == 'en' %}Transfer Scope &amp; Purchaser Status{% else %}বিক্রয়ের আওতা ও ক্রেতার অবস্থান (Transfer Scope){% endif %}
             </label>
@@ -375,8 +375,8 @@
 
         <!-- Question 5: Statutory Notice -->
         <div class="col-md-6">
-          <div class="p-3 rounded-3 border h-100 bg-light-subtle">
-            <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
+          <div class="haq-question p-3 rounded-3 border h-100 bg-light-subtle">
+            <label for="field_notice_status" class="form-label fw-bold text-navy d-flex align-items-center gap-2">
               <span class="badge bg-primary">{% if current_lang == 'en' %}5{% else %}৫{% endif %}</span>
               {% if current_lang == 'en' %}Statutory Notice to Co-Sharers{% else %}সহ-শরিকদের সংবিধিবদ্ধ নোটিশ (Statutory Notice){% endif %}
             </label>
@@ -410,8 +410,8 @@
 
         <!-- Question 6: Easements & Contiguous Land -->
         <div class="col-md-6">
-          <div class="p-3 rounded-3 border h-100 bg-light-subtle">
-            <label class="form-label fw-bold text-navy d-flex align-items-center gap-2">
+          <div class="haq-question p-3 rounded-3 border h-100 bg-light-subtle">
+            <label for="field_easement_status" class="form-label fw-bold text-navy d-flex align-items-center gap-2">
               <span class="badge bg-primary">{% if current_lang == 'en' %}6{% else %}৬{% endif %}</span>
               {% if current_lang == 'en' %}Easements &amp; Contiguous Boundaries{% else %}সাধারণ পথ ও সীমানা সংলগ্নতা (Easements &amp; Adjoining){% endif %}
             </label>
@@ -464,7 +464,7 @@
 
   <!-- Evaluation Results Section -->
   {% if assessment %}
-  <div class="card card-custom p-4 p-md-5 mb-4 bg-white shadow-sm border-{{ assessment.badge_color }}" id="haq-shufa-results-card">
+  <div class="card card-custom haq-results p-4 p-md-5 mb-4 bg-white shadow-sm border-{{ assessment.badge_color }}" id="haq-shufa-results-card">
 
     <!-- Top Result Banner -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-4 pb-3 border-bottom gap-3">
@@ -473,13 +473,13 @@
           {% if current_lang == 'en' %}Pre-Purchase Evaluation Classification:{% else %}ক্রয়পূর্ব মূল্যায়ন ফলাফল শ্রেণিবিভাগ:{% endif %}
         </span>
         <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-          <h3 class="fw-bold mb-0 text-{{ assessment.badge_color }}">
+        <h2 class="h3 fw-bold mb-0 text-{{ assessment.badge_color }}">
             {% if current_lang == 'en' %}
             {{ assessment.category }}
             {% else %}
             {{ assessment.category_bn or assessment.category }}
             {% endif %}
-          </h3>
+        </h2>
           <span class="badge bg-light text-secondary border small">
             {{ assessment.category }}
           </span>
@@ -521,10 +521,10 @@
     <!-- Detailed Findings Breakdown -->
     <div class="row g-4 mb-4">
       <div class="col-lg-6">
-        <h5 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
+        <h3 class="h5 fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-clipboard2-check text-teal"></i>
           {{ t('haq_shufa_findings_title') }}
-        </h5>
+        </h3>
         <div class="d-flex flex-column gap-2">
           {% for finding in assessment.findings %}
           <div class="p-3 rounded-3 border bg-white">
@@ -561,10 +561,10 @@
 
       <!-- Applicable Legal Provisions & Actions -->
       <div class="col-lg-6">
-        <h5 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
+        <h3 class="h5 fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-journal-text text-primary"></i>
           {{ t('haq_shufa_provisions_title') }}
-        </h5>
+        </h3>
 
         <div class="d-flex flex-column gap-3 mb-4">
           {% for statute in assessment.statutory_provisions %}
@@ -589,10 +589,10 @@
           {% endfor %}
         </div>
 
-        <h5 class="fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
+        <h3 class="h5 fw-bold text-navy mb-3 d-flex align-items-center gap-2" style="color: var(--brand-navy-900);">
           <i class="bi bi-list-check text-teal"></i>
           {{ t('haq_shufa_steps_title') }}
-        </h5>
+        </h3>
         <div class="p-3 rounded-3 border bg-white">
           <ul class="small text-secondary mb-0 ps-3 d-flex flex-column gap-2">
             {% for step in assessment.recommended_steps %}
@@ -606,19 +606,19 @@
   {% endif %}
 
   <!-- Comprehensive Due Diligence Checklist Table -->
-  <div class="card card-custom p-4 p-md-5 bg-white mb-4">
+  <div class="card card-custom haq-roadmap p-4 p-md-5 bg-white mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
-        <h4 class="fw-bold text-navy mb-1" style="color: var(--brand-navy-900);">
+        <h2 class="h4 fw-bold text-navy mb-1" style="color: var(--brand-navy-900);">
           {{ t('haq_shufa_roadmap_title') }}
-        </h4>
+        </h2>
         <p class="text-muted small mb-0">
           {{ t('haq_shufa_roadmap_desc') }}
         </p>
       </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive" role="region" tabindex="0" aria-label="{% if current_lang == 'bn' %}যাচাই রোডম্যাপের স্ক্রলযোগ্য সারণি{% else %}Scrollable diligence roadmap table{% endif %}">
       <table class="table table-custom table-hover">
         <thead>
           <tr>
@@ -649,13 +649,13 @@
   <div class="card card-custom p-4 bg-light border-0 text-center">
     <div class="max-w-600 mx-auto">
       <i class="bi bi-mortarboard text-teal fs-2 mb-2"></i>
-      <h5 class="fw-bold text-navy" style="color: var(--brand-navy-900);">
+      <h2 class="h5 fw-bold text-navy" style="color: var(--brand-navy-900);">
         {% if current_lang == 'en' %}
         LandTech Hackathon 2026 Academic Innovation Prototype
         {% else %}
         ল্যান্ডটেক হ্যাকাথন ২০২৬ একাডেমিক ইনোভেশন প্রোটোটাইপ
         {% endif %}
-      </h5>
+      </h2>
       <p class="text-secondary small mb-3">
         {% if current_lang == 'en' %}
         Prepared for Track P5 (Citizen Pre-Purchase Diligence) and P3 (Fraud &amp; Litigation Prevention). Designed to provide explainable pre-purchase awareness to prospective land purchasers in Bangladesh.
