@@ -57,9 +57,14 @@
               <div class="plot-location small text-muted">
                 <i class="bi bi-geo-alt-fill text-teal" aria-hidden="true"></i>
                 <span class="location-text">
-                  {{ item.plot.demo_mouza_code }}, {{ item.plot.demo_upazila }}
+                  {{ item.plot.mouza_name or '' }} ({{ item.plot.demo_mouza_code }}), {{ item.plot.demo_upazila }}
                 </span>
               </div>
+              {% if item.plot.dag_no %}
+                <div class="small fw-semibold text-secondary mt-1">
+                  {{ item.plot.dag_no }} &bull; {{ item.plot.survey_type or '' }}
+                </div>
+              {% endif %}
             </div>
 
             <div class="col-md-4">

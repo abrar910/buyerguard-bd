@@ -8,6 +8,7 @@ Bangla and English. Never produces legal guarantees or claims of official govern
 """
 
 from typing import Dict, Any, List, Optional
+from due_diligence_engine import DueDiligenceEngine
 
 
 class RiskEngine:
@@ -16,6 +17,9 @@ class RiskEngine:
     associated transaction histories to detect simulated inconsistencies,
     missing records, and potential double-selling conflicts.
     """
+
+    # Configurable risk points for City Survey screening
+    CITY_SURVEY_RISK_POINTS: int = 1
 
     @classmethod
     def evaluate_plot(
@@ -57,8 +61,24 @@ class RiskEngine:
         if khas_warning:
             warnings.append(khas_warning)
 
+        # 6. Rule: City Survey Screening Indicator (Adds exactly 1 risk point)
+        city_survey_warning = cls._check_city_survey(plot, lang=lang)
+        if city_survey_warning:
+            warnings.append(city_survey_warning)
+
         # Completeness calculation
         completeness = cls._calculate_completeness(plot, lang=lang)
+
+        # Calculate deterministic, idempotent risk score
+        rule_weights = {
+            "RULE_DUP_SALE": 3,
+            "RULE_INCOMPLETE_RECORD": 2,
+            "RULE_REF_MISMATCH": 2,
+            "RULE_UNKNOWN_CASE": 1,
+            "RULE_UNKNOWN_KHAS": 1,
+            "RULE_CITY_SURVEY": cls.CITY_SURVEY_RISK_POINTS,
+        }
+        risk_score = sum(rule_weights.get(w["rule_id"], 1) for w in warnings)
 
         # Determine overall status badge
         has_high = any(w["severity"] == "High" for w in warnings)
@@ -76,10 +96,17 @@ class RiskEngine:
             overall_status_en = "Review Recommended"
             status_badge = "warning"
         elif has_info:
-            overall_status = "Information Incomplete"
-            overall_status_bn = "তথ্য অপূর্ণাঙ্গ"
-            overall_status_en = "Information Incomplete"
-            status_badge = "info"
+            has_other_info = any(w["rule_id"] in {"RULE_UNKNOWN_CASE", "RULE_UNKNOWN_KHAS"} for w in warnings)
+            if has_other_info:
+                overall_status = "Information Incomplete"
+                overall_status_bn = "তথ্য অপূর্ণাঙ্গ"
+                overall_status_en = "Information Incomplete"
+                status_badge = "info"
+            else:
+                overall_status = "City Survey Screening Indicator"
+                overall_status_bn = "সিটি জরিপ স্ক্রীনিং সূচক"
+                overall_status_en = "City Survey Screening Indicator"
+                status_badge = "info"
         else:
             overall_status = "No Demo Flags Detected"
             overall_status_bn = "ডেমো ডেটায় কোনো অসঙ্গতি সনাক্ত হয়নি"
@@ -87,6 +114,9 @@ class RiskEngine:
             status_badge = "success"
 
         overall_status_display = overall_status_bn if is_bn else overall_status_en
+
+        # Execute automated 7-step due-diligence verification
+        due_diligence = DueDiligenceEngine.run_all_checks(plot, txs, lang=lang)
 
         return {
             "plot_id": plot.get("plot_id"),
@@ -98,9 +128,13 @@ class RiskEngine:
             "has_warnings": len(warnings) > 0,
             "warning_count": len(warnings),
             "warnings": warnings,
+            "risk_score": risk_score,
+            "city_survey_point_added": any(w["rule_id"] == "RULE_CITY_SURVEY" for w in warnings),
+            "has_city_survey_indicator": any(w["rule_id"] == "RULE_CITY_SURVEY" for w in warnings),
             "completeness": completeness,
             "has_duplicate_conflict": any(w["rule_id"] == "RULE_DUP_SALE" for w in warnings),
             "has_missing_info": completeness["missing_count"] > 0,
+            "due_diligence": due_diligence,
             "lang": lang,
         }
 
@@ -477,3 +511,70 @@ class RiskEngine:
                 "recommended_action_en": action_en,
             }
         return None
+
+    @classmethod
+    def _check_city_survey(cls, plot: Dict[str, Any], lang: str = "bn") -> Optional[Dict[str, Any]]:
+        """
+        Rule 6: City Survey Risk Scoring Indicator.
+        Adds exactly 1 risk point if survey_type explicitly matches 'City Survey'.
+        Does not add points for CS, SA, RS, BS or unknown survey types.
+        Accurately explains that this is a configured screening indicator for urban
+        cadastral boundary reconciliation, not legal proof of a defective title.
+        """
+        survey_type = str(plot.get("survey_type") or "").strip()
+        survey_type_lower = survey_type.lower()
+
+        # Explicit match for City Survey only
+        is_city_survey = (
+            survey_type_lower in {"city survey", "city-survey", "citysurvey", "সিটি জরিপ"}
+            or "city survey" in survey_type_lower
+            or "সিটি জরিপ" in survey_type
+        )
+
+        if not is_city_survey:
+            return None
+
+        is_bn = (lang != "en")
+        title_bn = "সিটি জরিপ স্ক্রীনিং সূচক (+১ ঝুঁকি পয়েন্ট)"
+        title_en = "City Survey Screening Indicator (+1 Risk Point)"
+
+        explanation_bn = (
+            "এই প্লটের জরিপের ধরন 'City Survey' (সিটি জরিপ) হিসেবে চিহ্নিত। "
+            "পৌর ও শহরাঞ্চলে সিটি জরিপ খতিয়ানের ক্ষেত্রে পূর্ববর্তী আরএস বা বিএস জরিপের নকশা ও বায়া দলিলের সাথে "
+            f"দাগ ও সীমানা পুঙ্খানুপুঙ্খ সমন্বয় প্রয়োজন হয় বিধায় কনফিগার করা নিয়ম অনুযায়ী ঠিক {cls.CITY_SURVEY_RISK_POINTS}টি "
+            "ঝুঁকি পয়েন্ট যোগ করা হয়েছে। এটি কোনো আইনি স্বত্ব ত্রুটির প্রমাণ নয়, বরং সতর্কতামূলক বিশ্লেষণ সূচক।"
+        )
+        explanation_en = (
+            "The recorded survey type for this plot explicitly matches 'City Survey'. "
+            "In municipal urban areas, City Survey porchas require rigorous cross-examination against earlier RS/BS cadastral "
+            f"maps and historical deeds to verify boundary reconciliation; exactly {cls.CITY_SURVEY_RISK_POINTS} risk point "
+            "is added under configured screening rules. This is an informational screening parameter, not legal proof of an ownership defect."
+        )
+
+        action_bn = (
+            "সিটি জরিপের পর্চা ও নকশার সাথে পূর্ববর্তী আরএস/বিএস খতিয়ানের দাগ নম্বর ও বায়া দলিলের মিল সরেজমিনে পরীক্ষা করুন।"
+        )
+        action_en = (
+            "Cross-examine City Survey porchas and layout sheets against prior RS/BS cadastral maps and historical deeds to verify parcel boundary harmony."
+        )
+
+        affected_bn = f"জরিপের ধরন: {survey_type}"
+        affected_en = f"Survey Type: {survey_type}"
+
+        return {
+            "rule_id": "RULE_CITY_SURVEY",
+            "title": title_bn if is_bn else title_en,
+            "title_bn": title_bn,
+            "title_en": title_en,
+            "severity": "Info",
+            "badge_class": "info",
+            "severity_display": "তথ্যমূলক (+১ পয়েন্ট)" if is_bn else "Info (+1 Point)",
+            "risk_points": cls.CITY_SURVEY_RISK_POINTS,
+            "affected_field": affected_bn if is_bn else affected_en,
+            "explanation": explanation_bn if is_bn else explanation_en,
+            "explanation_bn": explanation_bn,
+            "explanation_en": explanation_en,
+            "recommended_action": action_bn if is_bn else action_en,
+            "recommended_action_bn": action_bn,
+            "recommended_action_en": action_en,
+        }

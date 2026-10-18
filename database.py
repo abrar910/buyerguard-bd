@@ -20,8 +20,23 @@ def get_db_connection(db_path: Optional[str] = None) -> sqlite3.Connection:
     return conn
 
 
+NEW_PLOT_COLUMNS = [
+    ("dag_no", "TEXT"),
+    ("mouza_name", "TEXT"),
+    ("jl_no", "TEXT"),
+    ("sub_registry_office", "TEXT"),
+    ("reg_date", "TEXT"),
+    ("reg_details", "TEXT"),
+    ("survey_type", "TEXT"),
+    ("ownership_source", "TEXT"),
+    ("partition_deed_status", "TEXT"),
+    ("case_details", "TEXT"),
+    ("gov_interest_details", "TEXT"),
+]
+
+
 def init_db(db_path: Optional[str] = None) -> None:
-    """Create schema tables and indexes if they do not exist."""
+    """Create schema tables and indexes if they do not exist, and safely migrate existing tables."""
     conn = get_db_connection(db_path)
     with conn:
         conn.executescript("""
@@ -37,6 +52,17 @@ def init_db(db_path: Optional[str] = None) -> None:
                 case_info_status TEXT,
                 khas_acquisition_status TEXT,
                 description TEXT,
+                dag_no TEXT,
+                mouza_name TEXT,
+                jl_no TEXT,
+                sub_registry_office TEXT,
+                reg_date TEXT,
+                reg_details TEXT,
+                survey_type TEXT,
+                ownership_source TEXT,
+                partition_deed_status TEXT,
+                case_details TEXT,
+                gov_interest_details TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -59,6 +85,17 @@ def init_db(db_path: Optional[str] = None) -> None:
             CREATE INDEX IF NOT EXISTS idx_transactions_plot_id ON transactions(plot_id);
             CREATE INDEX IF NOT EXISTS idx_transactions_conflict ON transactions(conflict_group_id);
         """)
+
+        # Safe migration for existing databases: check for missing columns and add them
+        cur = conn.cursor()
+        cur.execute("PRAGMA table_info(plots);")
+        existing_cols = {row["name"] for row in cur.fetchall()}
+        for col_name, col_type in NEW_PLOT_COLUMNS:
+            if col_name not in existing_cols:
+                cur.execute(f"ALTER TABLE plots ADD COLUMN {col_name} {col_type};")
+
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_plots_dag ON plots(dag_no);")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_plots_survey ON plots(survey_type);")
     conn.close()
 
 
@@ -120,8 +157,11 @@ def search_plots(query: str, db_path: Optional[str] = None) -> List[Dict[str, An
                OR demo_mouza_code LIKE ?
                OR demo_district LIKE ?
                OR demo_upazila LIKE ?
+               OR dag_no LIKE ?
+               OR mouza_name LIKE ?
+               OR jl_no LIKE ?
             ORDER BY plot_id ASC
-        """, (pattern, pattern, pattern, pattern, pattern, pattern))
+        """, (pattern, pattern, pattern, pattern, pattern, pattern, pattern, pattern, pattern))
         rows = cur.fetchall()
         return [dict(r) for r in rows]
     finally:
